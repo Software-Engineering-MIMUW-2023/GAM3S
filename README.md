@@ -16,4 +16,5 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 # Here we present some UML that may be useful for understanding how our app works:
-![alt text](https://github.com/SaLukasik/insert-name/files/11093722/UML.pdf)
+
+[UML.pdf](https://github.com/SaLukasik/insert-name/files/11093737/UML.pdf)
