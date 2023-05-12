@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 
+import 'package:io_app/tic-tac-toe.dart';
+
 const bgColor = Color(0xFFFCEE0C);
 const highlightColor = Color(0xFF03D8F3);
 
 void main() {
+  // runApp(const MaterialApp(
+  //   home: Gomoku(),
+  // ));
+
   runApp(const MaterialApp(
     home: Home(),
   ));
 }
+
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
