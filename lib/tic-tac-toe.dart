@@ -1,20 +1,38 @@
 import 'package:flutter/material.dart';
 
+class Pair {
+  final int first;
+  final int second;
+
+  int get(int i) {
+    return i == 0 ? first : second;
+  }
+
+  Pair(this.first, this.second);
+}
+
 class GState {
   bool greenTurn;
   int row;
   int col;
-  int gScore = 0;
-  int yScore = 0;
+  int gScore;
+  int yScore;
+  int occupiedAmount = 0;
   List<List<int>> occupied = []; // -1 - green, 0 - nobody, 1 - yellow
   MaterialColor c = Colors.green;
   MaterialAccentColor ac = Colors.greenAccent;
 
-  GState(this.greenTurn, this.row, this.col);
+  GState(this.greenTurn, this.row, this.col, this.gScore, this.yScore);
 }
 
-GState GenerateGState(int row, int col) {
-  GState state = GState(true, row, col);
+Map<int, Color> setColor = {
+  -1: Colors.green,
+  0: Colors.lightBlue,
+  1: Colors.amber,
+};
+
+GState GenerateGState(int row, int col, gScore, yScore) {
+  GState state = GState(true, row, col, gScore, yScore);
 
   state.occupied = List.generate(
       row, (i) => List.filled(col, 0, growable: false),
@@ -65,7 +83,7 @@ List<Padding> listMaker(
   List<Padding> toReturn = List.generate(
       col,
       (i) => Padding(
-          padding: const EdgeInsets.all(3.0),
+          padding: const EdgeInsets.all(2.0),
           child: SizedBox(
               width: 40,
               height: 40,
@@ -75,7 +93,7 @@ List<Padding> listMaker(
                 onPressed: () {
                   func(row, i % col, state);
                 },
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: setColor[state.occupied[row][i % col]],
                 child: Text("($row, ${i % col})"),
               ))));
 
@@ -114,83 +132,72 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static int row = 15;
   static int col = 15;
-  late GState state = GenerateGState(row, col);
+  late GState state = GenerateGState(row, col, 0, 0);
+
+  List<Pair> sides = [Pair(-1, 0), Pair(-1, -1), Pair(0, -1), Pair(1, -1)];
+
+  bool _isFieldOccupied(int x, int y, List<List<int>> occupied) {
+    return occupied[x][y] != 0;
+  }
+
+  int checkOneSide(
+      int c, List<List<int>> occupied, int x, int y, int j, int i, int fac) {
+    int newX = x + j * sides[i].get(0) * fac;
+    int newY = y + j * sides[i].get(1) * fac;
+
+    return !(0 < newX || newX >= row || newY < 0 || newX >= col) &&
+        c == occupied[newX][newY] ? 1 : 0;
+  }
+
+  bool _checkWinCondition(int x, int y, List<List<int>> occupied) {
+    int c = occupied[x][y];
+
+    for (int i = 0; i < 4; i++) {
+      // sprawdzanie 4 opcji zwycięstwa
+      int score = 0;
+      // trzeba spawdzic do 4 wartości z każdej strony
+      for (int j = 1; j <= 4; j++) {
+        score += checkOneSide(c, occupied, x, y, j, i, 1);
+        score += checkOneSide(c, occupied, x, y, j, i, -1);
+      }
+
+      if (score >= 5) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 
   void _makeTurn(int x, int y, GState state) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      // int posToken = -1;
-      // List<List<bool>> allowed = state.yMoves;
-      //
-      // List<List<bool>> enemy_allowed = state.gMoves;
-      // int myHeadX = state.yHeadX;
-      // int myHeadY = state.yHeadY;
-      // if (state.greenTurn) {
-      //   allowed = state.gMoves;
-      //   enemy_allowed = state.yMoves;
-      //   posToken = 1;
-      //   myHeadX = state.gHeadX;
-      //   myHeadY = state.gHeadY;
-      // }
-      // print("HeadX: $myHeadX, HeadY: $myHeadY\n");
-      // print("x: $x, y: $y\n");
-      // int newHeadX = x;
-      // int newHeadY = y;
-      // if (allowed[x][y]) {
-      //   //poruszanie się
-      //   int toAddX = -1;
-      //   int toAddY = -1;
-      //   if (x < myHeadX) {
-      //     toAddX = 1;
-      //   }
-      //   if (y < myHeadY) {
-      //     toAddY = 1;
-      //   }
-      //   if (x == myHeadX) {
-      //     toAddX = 0;
-      //   }
-      //   if (y == myHeadY) {
-      //     toAddY = 0;
-      //   }
-      //   print("to add $toAddX, $toAddY\n");
-      //   do {
-      //
-      //     state.pos[x][y] = posToken;
-      //     enemy_allowed[x][y] = false;
-      //     allowed[x][y] = false;
-      //     x+= toAddX;
-      //     y+= toAddY;
-      //     print("Pos added x: $x, y: $y\n");
-      //   } while (x != myHeadX || y != myHeadY);
-      //   // aktualizacja allowed:
-      //   //Uwaga!!! Od nowa trzeba zrobić cały na false!!! Najlepiej zrobić funkcję, której ”edziemożna
-      //   // użyć też przy inicjacji i tutaj...
-      //   //
-      //   state.greenTurn = !state.greenTurn;
-      //   if (state.greenTurn == true) { //ruch wykonał żółty
-      //     state.yHeadX = newHeadX;
-      //     state.yHeadY = newHeadY;
-      //
-      //     state.c = Colors.green;
-      //     state.ac = Colors.greenAccent;
-      //   }
-      //   else{ //ruch wykonał zielony
-      //     state.gHeadX = newHeadX;
-      //     state.gHeadY = newHeadY;
-      //
-      //     state.ac = Colors.amberAccent;
-      //     state.c = Colors.amber;
-      //   }
-      //
-      //
-      // }
-      // mainColorMatrix = matrixColorSet(state); // aktualizuje macierz kolorow
-      // mi nie potrzbna
-      // mainColorSplash = matrixColorSplashSet(state);
+      int c = 1;
+      if (state.greenTurn) {
+        c = -1;
+      }
+
+      if (!_isFieldOccupied(x, y, state.occupied)) {
+        state.occupied[x][y] = c;
+        state.occupiedAmount++;
+
+        if (_checkWinCondition(x, y, state.occupied)) {
+          state = GenerateGState(
+              row,
+              col,
+              state.greenTurn ? 1 + state.gScore : state.gScore,
+              state.greenTurn ? state.yScore : 1 + state.yScore);
+        }
+
+        if (state.occupiedAmount >= row * col) {
+          state = GenerateGState(
+              row,
+              col,
+              state.gScore,
+              state.yScore);
+        }
+      }
+
+      state.greenTurn = !state.greenTurn;
     });
   }
 
@@ -241,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButton(
             onPressed: () {
               setState(() {
-                state = GenerateGState(row, col);
+                state = GenerateGState(row, col, 0, 0);
               });
             },
             tooltip: 'Reset',
