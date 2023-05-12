@@ -29,17 +29,8 @@ Map<int, Color> setColor = {
   -1: Colors.green,
   0: Colors.lightBlue,
   1: Colors.amber,
+  2: Colors.black26
 };
-
-GState GenerateGState(int row, int col, gScore, yScore) {
-  GState state = GState(true, row, col, gScore, yScore);
-
-  state.occupied = List.generate(
-      row, (i) => List.filled(col, 0, growable: false),
-      growable: false);
-
-  return state;
-}
 
 class MyFloatingActionButton extends FloatingActionButton {
   final int x;
@@ -132,12 +123,25 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static int row = 15;
   static int col = 15;
+  static Pair startFields = Pair(7, 7);
   late GState state = GenerateGState(row, col, 0, 0);
 
   List<Pair> sides = [Pair(-1, 0), Pair(-1, -1), Pair(0, -1), Pair(1, -1)];
 
+  GState GenerateGState(int row, int col, gScore, yScore) {
+    GState state = GState(true, row, col, gScore, yScore);
+
+    state.occupied = List.generate(
+        row, (i) => List.filled(col, 0, growable: false),
+        growable: false);
+
+    state.occupied[startFields.get(0)][startFields.get(1)] = 2;
+
+    return state;
+  }
+
   bool _isFieldOccupied(int x, int y, List<List<int>> occupied) {
-    return occupied[x][y] != 0;
+    return occupied[x][y] != 0 && occupied[x][y] != 2;
   }
 
   int checkOneSide(
@@ -145,21 +149,40 @@ class _MyHomePageState extends State<MyHomePage> {
     int newX = x + j * sides[i].get(0) * fac;
     int newY = y + j * sides[i].get(1) * fac;
 
-    return !(0 < newX || newX >= row || newY < 0 || newX >= col) &&
-        c == occupied[newX][newY] ? 1 : 0;
+    return !(0 > newX || newX >= row || newY < 0 || newY >= col) &&
+            c == occupied[newX][newY]
+        ? 1
+        : 0;
   }
 
   bool _checkWinCondition(int x, int y, List<List<int>> occupied) {
     int c = occupied[x][y];
 
+    // print("next: \n");
     for (int i = 0; i < 4; i++) {
+      // print("i: $i");
       // sprawdzanie 4 opcji zwycięstwa
-      int score = 0;
+      int score = 1;
+      bool side1Returned0 = false;
+      bool side2Returned0 = false;
       // trzeba spawdzic do 4 wartości z każdej strony
       for (int j = 1; j <= 4; j++) {
-        score += checkOneSide(c, occupied, x, y, j, i, 1);
-        score += checkOneSide(c, occupied, x, y, j, i, -1);
+        // print("j: $j");
+        if (!side1Returned0) {
+          int res = checkOneSide(c, occupied, x, y, j, i, 1);
+          // print("side1Returned0: $res");
+          score += res;
+          side1Returned0 = res == 0;
+        }
+
+        if (!side2Returned0) {
+          int res = checkOneSide(c, occupied, x, y, j, i, -1);
+          // print("side2Returned0: $res");
+          score += res;
+          side2Returned0 = res == 0;
+        }
       }
+      // print("sore: $score");
 
       if (score >= 5) {
         return true;
@@ -169,11 +192,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
-  void _makeTurn(int x, int y, GState state) {
+  void _makeTurn(int x, int y, GState stateLoc) {
     setState(() {
       int c = 1;
       if (state.greenTurn) {
         c = -1;
+      }
+
+      if (state.occupiedAmount == 0 &&
+          (x != startFields.get(0) || y != startFields.get(1))) {
+        return;
       }
 
       if (!_isFieldOccupied(x, y, state.occupied)) {
@@ -186,18 +214,14 @@ class _MyHomePageState extends State<MyHomePage> {
               col,
               state.greenTurn ? 1 + state.gScore : state.gScore,
               state.greenTurn ? state.yScore : 1 + state.yScore);
+        } else {
+          if (state.occupiedAmount >= row * col) {
+            state = GenerateGState(row, col, state.gScore, state.yScore);
+          }
         }
 
-        if (state.occupiedAmount >= row * col) {
-          state = GenerateGState(
-              row,
-              col,
-              state.gScore,
-              state.yScore);
-        }
+        state.greenTurn = !state.greenTurn;
       }
-
-      state.greenTurn = !state.greenTurn;
     });
   }
 
@@ -205,16 +229,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     late var buttonColumn = listMaker3(
         row, col, state, (i, col, state) => _makeTurn(i, col, state));
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Center(child: Text(widget.title)),
       ),
       body: Center(
