@@ -10,18 +10,40 @@ class GState {
   int col;
   int gScore = 0;
   int yScore = 0;
+  String result = "";
+  bool gMobility = true;
+  bool yMobility = true;
   List<List<int>> pos = [];
   List<List<bool>> gMoves = [];
   List<List<bool>> yMoves = [];
-  MaterialColor c = Colors.green;
-  MaterialAccentColor ac = Colors.greenAccent;
+  List<List<bool>> cMoves = [];
   GState(this.greenTurn, this.gHeadX, this.gHeadY, this.yHeadX, this.yHeadY, this.row, this.col);
 }
 
 Map<int, Color> setColor = {
-  -1: Colors.green,
+  -1: Colors.amber,
   0: Colors.lightBlue,
-  1: Colors.amber,
+  1: Colors.green,
+};
+
+Map<bool, Color> setPlayerCol  = {
+  false: Colors.amber,
+  true: Colors.green,
+};
+
+Map<bool, Color> setColorGSPlash = {
+  false: Colors.redAccent,
+  true: Colors.greenAccent,
+};
+
+Map<bool, Color> setColorASPlash = {
+  false: Colors.redAccent,
+  true: Colors.amberAccent,
+};
+
+Map<bool, Map<bool, Color>> setColorSplash  = {
+  false: setColorASPlash,
+  true: setColorGSPlash,
 };
 
 class MyWidget extends StatefulWidget {
@@ -34,15 +56,17 @@ class MyWidget extends StatefulWidget {
   }
 }
 
-List<List<bool>> UpdateGState(int row, int col, List<List<int>> pos, int xHeadX, int xHeadY){
+List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, int xHeadY){
   List<List<bool>> xMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
-
+print("--xmoves:--\n");
+  bool moves = false;
   // poziome ustalnie pozycji
   for (var i = 0; i < col; i++) {
     if (pos[xHeadX][i] == 0) {
       xMoves[xHeadX][i] = true;
+      moves = true;
     }
   }
 
@@ -50,13 +74,41 @@ List<List<bool>> UpdateGState(int row, int col, List<List<int>> pos, int xHeadX,
   for (var i = 0; i < row; i++) {
     if (pos[i][xHeadY] == 0) {
       xMoves[i][xHeadY] = true;
+      moves = true;
     }
   }
+  print("Heads: $xHeadX, $xHeadY \n");
+  // na skos w z dołu w prawo
+  int px = (xHeadX + xHeadY);
+  if (px > row-1) px = row-1;
+  int py = (xHeadX + xHeadY) - col + 1;
+  if (py<0) py = 0;
+  print("dl to ur: $px, $py \n");
+  while(px != -1 && py != col) {
+    if (pos[px][py] == 0) {
+      xMoves[px][py] = true;
+      moves = true;
+    }
+    py+=1;
+    px-=1;
+  }
 
-  // na skos w prawo
-
-
-  return xMoves;
+  //na skos z góry na prawo
+  px = (xHeadX - xHeadY);
+  if (px < 0) px = 0;
+  py = (xHeadY - xHeadX);
+  if (py < 0) py = 0;
+  print("ul to dr: $px, $py \n");
+  while(px != row && py != col) {
+    if (pos[px][py] == 0) {
+      xMoves[px][py] = true;
+      moves = true;
+    }
+    py+=1;
+    px+=1;
+  }
+  print("dupa7\n");
+  return [xMoves,moves];
 }
 
 GState GenerateGState(int row, int col) {
@@ -92,6 +144,7 @@ GState GenerateGState(int row, int col) {
   for( var i = 1; i < row - 1; i++ ) {
     state.gMoves[i][col - 1 - i] = true;
   }
+  state.cMoves = state.gMoves;
   return state;
 }
 
@@ -102,76 +155,7 @@ class MyFloatingActionButton extends FloatingActionButton {
       {super.key, required super.onPressed, super.child, super.backgroundColor, super.splashColor});
 }
 
-void matrixColorUpdate(GState state, List<List<MaterialColor>> mat) {
-  List<List<int>> allowed = state.pos;
-
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == 0) {
-        mat[j][i] = Colors.lightBlue;
-      } else if (allowed[j][i] == 1 ) {
-        mat[j][i] = Colors.green;
-      } else {
-        mat[j][i] = Colors.amber;
-      }
-    }
-  }
-}
-
-List<List<MaterialColor>> matrixColorSet(GState state) {
-  List<List<int>> allowed = state.pos;
-  var toReturn = List.generate(
-      state.row, (i) => List.filled(state.col, Colors.lightBlue, growable: false),
-      growable: false);
-
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == 0) {
-        toReturn[j][i] = Colors.lightBlue;
-      } else if (allowed[j][i] == 1 ) {
-        toReturn[j][i] = Colors.green;
-      } else {
-        toReturn[j][i] = Colors.amber;
-      }
-    }
-  }
-
-  return toReturn;
-}
-
-List<List<MaterialAccentColor>> matrixColorSplashSet(GState state) {
-  List<List<bool>> allowed = state.yMoves;
-  if (state.greenTurn) {
-    allowed = state.gMoves;
-  }
-  var toReturn = List.generate(
-      state.row, (i) => List.filled(state.col,Colors.redAccent, growable: true),
-      growable: false);
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == true) toReturn[j][i] = state.ac;
-    }
-  }
-
-  return toReturn;
-}
-
-
-void matrixColorSplashUpdate(GState state, List<List<MaterialAccentColor>> mat) {
-  List<List<bool>> allowed = state.yMoves;
-  if (state.greenTurn) {
-    allowed = state.gMoves;
-  }
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == true) mat[j][i] = state.ac;
-    }
-  }
-
-
-}
-
-List<SizedBox> listMaker(List<List<MaterialColor>> mainCM, List<List<MaterialAccentColor>> mainCS, int row, int col, GState state,  Function(int x, int y, GState state) func) {
+List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y, GState state) func) {
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => SizedBox(
@@ -183,8 +167,8 @@ List<SizedBox> listMaker(List<List<MaterialColor>> mainCM, List<List<MaterialAcc
             onPressed: () {
               func(row, i % col, state);
             },
-            backgroundColor: mainCM[row][i % col],
-            splashColor: mainCS[row][i % col],
+            backgroundColor: setColor[state.pos[row][i % col]],
+            splashColor: (setColorSplash[state.greenTurn])![state.cMoves[row][i % col]],
             child: Text("($row, ${i % col})"),
           )));
 
@@ -242,11 +226,11 @@ List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y
   return toReturn;
 }
 
-List<Row> listMaker3(List<List<MaterialColor>> mainCM, List<List<MaterialAccentColor>> mainCS, int row, int col, GState state, Function(int x, int y, GState state) func) {
+List<Row> listMaker3(int row, int col, GState state, Function(int x, int y, GState state) func) {
   late var toReturn = List.generate(
       col,
           (i) => Row(
-        children: listMaker(mainCM, mainCS, i, col, state, (i, col, state) => func(i, col, state)),
+        children: listMaker(i, col, state, (i, col, state) => func(i, col, state)),
       ));
 
   for (var i = row - 1; i >= 1; i -= 1) {
@@ -281,13 +265,6 @@ class _MyHomePageState extends State<Snakess> {
   static int row = 5;
   static int col = 5;
   late GState state = GenerateGState(row, col);
-  late var movesMatrix = List.generate(
-      row, (i) => List.filled(col, 0, growable: false),
-      growable: false);
-
-  late var mainColorMatrix = matrixColorSet(state);
-  late var mainColorSplash = matrixColorSplashSet(state);
-
 
 
   void _makeTurn(int x, int y, GState state) {
@@ -299,11 +276,13 @@ class _MyHomePageState extends State<Snakess> {
       // called again, and so nothing would appear to happen.
       int posToken = -1;
       List<List<bool>> allowed = state.yMoves;
-
       List<List<bool>> enemy_allowed = state.gMoves;
       int myHeadX = state.yHeadX;
       int myHeadY = state.yHeadY;
+
+      int toadd = 0;
       if (state.greenTurn) {
+
         allowed = state.gMoves;
         enemy_allowed = state.yMoves;
         posToken = 1;
@@ -314,7 +293,9 @@ class _MyHomePageState extends State<Snakess> {
       print("x: $x, y: $y\n");
       int newHeadX = x;
       int newHeadY = y;
+
       if (allowed[x][y]) {
+        print("dupa1\n");
         //poruszanie się
         int toAddX = -1;
         int toAddY = -1;
@@ -332,7 +313,7 @@ class _MyHomePageState extends State<Snakess> {
         }
         print("to add $toAddX, $toAddY\n");
         do {
-
+          if (state.pos[x][y]  == -posToken) toadd = 1;
           state.pos[x][y] = posToken;
           enemy_allowed[x][y] = false;
           allowed[x][y] = false;
@@ -345,25 +326,34 @@ class _MyHomePageState extends State<Snakess> {
         // użyć też przy inicjacji i tutaj...
         //
         state.greenTurn = !state.greenTurn;
+
         if (state.greenTurn == true) { //ruch wykonał żółty
+          state.yScore += toadd;
           state.yHeadX = newHeadX;
           state.yHeadY = newHeadY;
-
-          state.c = Colors.green;
-          state.ac = Colors.greenAccent;
+          var updated =  UpdateXState(state.row,state.col, state.pos, state.gHeadX, state.gHeadY);
+          state.gMoves = updated[0];
+          state.gMobility = updated[1];
+          state.cMoves = state.gMoves;
         }
         else{ //ruch wykonał zielony
+          print("dupa2\n");
           state.gHeadX = newHeadX;
           state.gHeadY = newHeadY;
-
-          state.ac = Colors.amberAccent;
-          state.c = Colors.amber;
+          state.gScore += toadd;
+          var updated = UpdateXState(state.row,state.col, state.pos, state.yHeadX, state.yHeadY);
+          state.yMoves = updated[0];
+          state.yMobility = updated[1];
+          state.cMoves = state.yMoves;
         }
 
+        if (! state.yMobility || ! state.gMobility) {
+          if (state.gScore > state.yScore && state.yMobility == false) state.result = "Green wins!!!";
+          else if (state.gScore < state.yScore && state.gMobility == false) state.result = "Yellow wins!!!";
+          else if (state.gMobility == false && state.yMobility == false) state.result = "Remis!!!";
 
+        }
       }
-      mainColorMatrix = matrixColorSet(state);
-      mainColorSplash = matrixColorSplashSet(state);
 
     });
   }
@@ -373,7 +363,7 @@ class _MyHomePageState extends State<Snakess> {
   @override
   Widget build(BuildContext context) {
     late var buttonColumn =
-    listMaker3(mainColorMatrix, mainColorSplash, row, col, state, (i, col, state) => _makeTurn(i, col, state));
+    listMaker3(row, col, state, (i, col, state) => _makeTurn(i, col, state));
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -400,7 +390,7 @@ class _MyHomePageState extends State<Snakess> {
       floatingActionButton:
       Column(children: [Spacer(flex: 50),
         Text(
-          '${state.greenTurn}',
+          '${state.result}',
 
         ),
         Spacer(),
@@ -414,7 +404,7 @@ class _MyHomePageState extends State<Snakess> {
               });
             },
             tooltip: 'Player',
-            backgroundColor: state.c,
+            backgroundColor: setPlayerCol[state.greenTurn],
             child: const Icon(Icons.accessibility_new),
           ),
           Spacer(),
@@ -422,11 +412,6 @@ class _MyHomePageState extends State<Snakess> {
             onPressed: () {
               setState(() {
                 state = GenerateGState(row, col);
-                movesMatrix = List.generate(
-                    row, (i) => List.filled(col, 0, growable: false),
-                    growable: false);
-                mainColorMatrix = matrixColorSet(state);
-                mainColorSplash = matrixColorSplashSet(state);
               });
             },
             tooltip: 'Reset',
