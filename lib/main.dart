@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tic-tac-toe.dart';
 import 'dots_and_boxes.dart';
+import 'snakess.dart';
 
 const bgColor = Color(0xFFFCEE0C);
 const highlightColor = Color(0xFF03D8F3);
@@ -56,7 +57,7 @@ class Home extends StatelessWidget {
             ),
             GameButton("tic-tac-toe"),
             GameButton("dots-and-boxes"),
-            GameButton("game 3"),
+            GameButton("snakess"),
           ],
         ),
       ),
@@ -93,6 +94,14 @@ class GameButton extends StatelessWidget {
                   MaterialPageRoute(
                       builder: (context) =>
                       const DotsAndBoxes(title: 'Dots and Boxes')), // or Gomoku()
+                );
+                break;
+              case "snakess":
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                      const Snakess(title: 'Snakess')), // or Gomoku()
                 );
                 break;
               // add more cases for each game
