@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'tic-tac-toe.dart';
+import 'dots_and_boxes.dart';
 
 const bgColor = Color(0xFFFCEE0C);
 const highlightColor = Color(0xFF03D8F3);
@@ -54,7 +55,7 @@ class Home extends StatelessWidget {
               ),
             ),
             GameButton("tic-tac-toe"),
-            GameButton("game 2"),
+            GameButton("dots-and-boxes"),
             GameButton("game 3"),
           ],
         ),
@@ -86,7 +87,14 @@ class GameButton extends StatelessWidget {
                           const MyHomePage(title: 'Gomoku')), // or Gomoku()
                 );
                 break;
-
+              case "dots-and-boxes":
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                      const DotsAndBoxes(title: 'Dots and Boxes')), // or Gomoku()
+                );
+                break;
               // add more cases for each game
               default:
                 break;
