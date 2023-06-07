@@ -118,6 +118,21 @@ List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, in
   return [xMoves,moves];
 }
 
+List<List<int>> monoListPost(int row, int col, int winner) {
+  List<List<int>> ret;
+  if (winner == 0) {
+      ret = List.generate(
+        row, (i) => List.filled(col, 1 -2* (i%2), growable: false));
+
+  }
+  else {
+    ret  = List.generate(
+        row, (i) => List.filled(col, winner, growable: false));
+
+  }
+   return ret;
+}
+
 GState GenerateGState(int row, int col) {
 
   GState state = GState(true, 0, col-1, row-1, 0, row, col);
@@ -177,6 +192,7 @@ String whereIsHead(int x, int y,GState state) {
   }
   return ret;
 }
+
 
 List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y, GState state) func) {
   List<SizedBox> toReturn = List.generate(
@@ -391,10 +407,18 @@ class _MyHomePageState extends State<Snakess> {
         }
 
         if (! state.yMobility || ! state.gMobility) {
-          if (state.gScore > state.yScore && state.yMobility == false) state.result = "Green wins!!!";
-          else if (state.gScore < state.yScore && state.gMobility == false) state.result = "Yellow wins!!!";
-          else if (state.gMobility == false && state.yMobility == false) state.result = "Remis!!!";
-
+          if (state.gScore > state.yScore && state.yMobility == false){
+            state.result = "Green wins!!!";
+            state.pos =  monoListPost(state.row, state.col, 1);
+          }
+          else if (state.gScore < state.yScore && state.gMobility == false) {
+            state.result = "Yellow wins!!!";
+            state.pos =  monoListPost(state.row, state.col, -1);
+          }
+          else if (state.gMobility == false && state.yMobility == false) {
+            state.result = "Remis!!!";
+            state.pos =  monoListPost(state.row, state.col, 0);
+          }
         }
       }
       //print("states: ${state.gMobility}, ${state.yMobility}");
