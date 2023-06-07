@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class GState {
@@ -60,7 +62,7 @@ List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, in
   List<List<bool>> xMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
-print("--xmoves:--\n");
+//print("--xmoves:--\n");
   bool moves = false;
   // poziome ustalnie pozycji
   for (var i = 0; i < col; i++) {
@@ -77,13 +79,16 @@ print("--xmoves:--\n");
       moves = true;
     }
   }
-  print("Heads: $xHeadX, $xHeadY \n");
+  //print("Heads: $xHeadX, $xHeadY \n");
   // na skos w z dołu w prawo
-  int px = (xHeadX + xHeadY);
+  int delta = min(xHeadY, row-1-xHeadX);
+  int px = xHeadX + delta;
+  int py = xHeadY - delta;
+/*  int px = (xHeadX + xHeadY);
   if (px > row-1) px = row-1;
   int py = (xHeadX + xHeadY) - col + 1;
-  if (py<0) py = 0;
-  print("dl to ur: $px, $py \n");
+  if (py<0) py = 0;*/
+  //print("dl to ur: $px, $py \n");
   while(px != -1 && py != col) {
     if (pos[px][py] == 0) {
       xMoves[px][py] = true;
@@ -94,11 +99,14 @@ print("--xmoves:--\n");
   }
 
   //na skos z góry na prawo
-  px = (xHeadX - xHeadY);
+  delta = min(xHeadY, xHeadX);
+  px = xHeadX - delta;
+  py = xHeadY - delta;
+/*  px = (xHeadX - xHeadY);
   if (px < 0) px = 0;
   py = (xHeadY - xHeadX);
-  if (py < 0) py = 0;
-  print("ul to dr: $px, $py \n");
+  if (py < 0) py = 0;*/
+  //print("ul to dr: $px, $py \n");
   while(px != row && py != col) {
     if (pos[px][py] == 0) {
       xMoves[px][py] = true;
@@ -107,18 +115,18 @@ print("--xmoves:--\n");
     py+=1;
     px+=1;
   }
-  print("dupa7\n");
   return [xMoves,moves];
 }
 
 GState GenerateGState(int row, int col) {
+  print("STARTGSTATE\n");
   GState state = GState(true, 0, col-1, row-1, 0, row, col);
   state.pos =   List.generate(
       row, (i) => List.filled(col, 0, growable: false),
       growable: false);
   state.pos[0][col-1] = 1;
   state.pos[row-1][0] = -1;
-
+  print("1\n");
   state.yMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
@@ -128,10 +136,12 @@ GState GenerateGState(int row, int col) {
   for( var i = 0; i < row - 1; i++ ) {
     state.yMoves[i][0] = true;
   }
+  print("1.5\n");
   for( var i = 1; i < row - 1; i++ ) {
+    if (i == row || col - 1 - i < 0) break;
     state.yMoves[i][col - 1 - i] = true;
   }
-
+  print("2\n");
   state.gMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
@@ -142,9 +152,11 @@ GState GenerateGState(int row, int col) {
     state.gMoves[i][col-1] = true;
   }
   for( var i = 1; i < row - 1; i++ ) {
+    if (i == row || col - 1 - i < 0) break;
     state.gMoves[i][col - 1 - i] = true;
   }
   state.cMoves = state.gMoves;
+  print("4\n");
   return state;
 }
 
@@ -155,7 +167,19 @@ class MyFloatingActionButton extends FloatingActionButton {
       {super.key, required super.onPressed, super.child, super.backgroundColor, super.splashColor});
 }
 
+String whereIsHead(int x, int y,GState state) {
+  String ret = "";
+  if (x == state.gHeadX && y == state.gHeadY) {
+    ret += "S";
+  }
+  if (x == state.yHeadX && y == state.yHeadY) {
+    ret += "S";
+  }
+  return ret;
+}
+
 List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y, GState state) func) {
+  print("start1\n");
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => SizedBox(
@@ -169,7 +193,8 @@ List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y,
             },
             backgroundColor: setColor[state.pos[row][i % col]],
             splashColor: (setColorSplash[state.greenTurn])![state.cMoves[row][i % col]],
-            child: Text("($row, ${i % col})"),
+            //child: Text("($row, ${i % col})"),
+            child: Text(whereIsHead(row, i % col, state)),
           )));
 
   for (var i = col - 1; i >= 1; i -= 1) {
@@ -187,10 +212,12 @@ List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y,
               child: null,
             )));
   }
+  print("done1\n");
   return toReturn;
 }
 
 List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y, GState state) func) {
+  print("start2\n");
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => SizedBox(
@@ -223,12 +250,14 @@ List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y
                         height: 20,
                         child: FloatingActionButton(onPressed: () {})))) ))));
   }
+  print("done2\n");
   return toReturn;
 }
 
 List<Row> listMaker3(int row, int col, GState state, Function(int x, int y, GState state) func) {
+  print("start3\n");
   late var toReturn = List.generate(
-      col,
+      row,
           (i) => Row(
         children: listMaker(i, col, state, (i, col, state) => func(i, col, state)),
       ));
@@ -240,7 +269,7 @@ List<Row> listMaker3(int row, int col, GState state, Function(int x, int y, GSta
           children: listMaker2(i, col, state, (i, col, state) => func(i, col, state)),
         ));
   }
-
+  print("done3\n");
   return toReturn;
 }
 
@@ -264,6 +293,7 @@ class _MyHomePageState extends State<Snakess> {
 
   static int row = 5;
   static int col = 5;
+
   late GState state = GenerateGState(row, col);
 
 
@@ -289,13 +319,12 @@ class _MyHomePageState extends State<Snakess> {
         myHeadX = state.gHeadX;
         myHeadY = state.gHeadY;
       }
-      print("HeadX: $myHeadX, HeadY: $myHeadY\n");
-      print("x: $x, y: $y\n");
+      //print("HeadX: $myHeadX, HeadY: $myHeadY\n");
+      //print("x: $x, y: $y\n");
       int newHeadX = x;
       int newHeadY = y;
 
       if (allowed[x][y]) {
-        print("dupa1\n");
         //poruszanie się
         int toAddX = -1;
         int toAddY = -1;
@@ -311,7 +340,7 @@ class _MyHomePageState extends State<Snakess> {
         if (y == myHeadY) {
           toAddY = 0;
         }
-        print("to add $toAddX, $toAddY\n");
+        //print("to add $toAddX, $toAddY\n");
         do {
           if (state.pos[x][y]  == -posToken) toadd = 1;
           state.pos[x][y] = posToken;
@@ -319,7 +348,7 @@ class _MyHomePageState extends State<Snakess> {
           allowed[x][y] = false;
           x+= toAddX;
           y+= toAddY;
-          print("Pos added x: $x, y: $y\n");
+          //print("Pos added x: $x, y: $y\n");
         } while (x != myHeadX || y != myHeadY);
         // aktualizacja allowed:
         //Uwaga!!! Od nowa trzeba zrobić cały na false!!! Najlepiej zrobić funkcję, której ”edziemożna
@@ -335,9 +364,16 @@ class _MyHomePageState extends State<Snakess> {
           state.gMoves = updated[0];
           state.gMobility = updated[1];
           state.cMoves = state.gMoves;
+
+          if (updated[1] == false) {
+            state.greenTurn = false;
+            var updated =  UpdateXState(state.row,state.col, state.pos, state.yHeadX, state.yHeadY);
+            state.yMoves = updated[0];
+            state.yMobility = updated[1];
+            state.cMoves = state.yMoves;
+          }
         }
         else{ //ruch wykonał zielony
-          print("dupa2\n");
           state.gHeadX = newHeadX;
           state.gHeadY = newHeadY;
           state.gScore += toadd;
@@ -345,6 +381,14 @@ class _MyHomePageState extends State<Snakess> {
           state.yMoves = updated[0];
           state.yMobility = updated[1];
           state.cMoves = state.yMoves;
+
+          if (updated[1] == false) {
+            state.greenTurn = true;
+            var updated =  UpdateXState(state.row,state.col, state.pos, state.gHeadX, state.gHeadY);
+            state.gMoves = updated[0];
+            state.gMobility = updated[1];
+            state.cMoves = state.gMoves;
+          }
         }
 
         if (! state.yMobility || ! state.gMobility) {
@@ -354,7 +398,7 @@ class _MyHomePageState extends State<Snakess> {
 
         }
       }
-
+      //print("states: ${state.gMobility}, ${state.yMobility}");
     });
   }
 
@@ -377,78 +421,77 @@ class _MyHomePageState extends State<Snakess> {
         title: Center(child: Text(widget.title)),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                color: Colors.lightBlueAccent,
-                child: Column(children: buttonColumn)),
-          ),
-        ),
-      ),
-      floatingActionButton:
-      Column(children: [Spacer(flex: 50),
-        Text(
-          '${state.result}',
-
-        ),
-        Spacer(),
-        Row(children: [
-          Spacer(flex:2),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-
-
-              });
-            },
-            tooltip: 'Player',
-            backgroundColor: setPlayerCol[state.greenTurn],
-            child: const Icon(Icons.accessibility_new),
+        child: Column(children:  <Widget>[Spacer(),
+          Text(
+            '${state.result}',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                state = GenerateGState(row, col);
-              });
-            },
-            tooltip: 'Reset',
-            backgroundColor: Colors.redAccent,
-            child: const Icon(Icons.refresh),
+          Expanded(flex: 10,child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                  color: Colors.lightBlueAccent,
+                  child: Column(children: buttonColumn)),
+            ),
+          ),),
+          Spacer(),
+          Row(children: [
+            Spacer(flex:2),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+
+
+                });
+              },
+              tooltip: 'Player',
+              backgroundColor: setPlayerCol[state.greenTurn],
+              child: const Icon(Icons.accessibility_new),
+            ),
+            Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  state = GenerateGState(row, col);
+                });
+              },
+              tooltip: 'Reset',
+              backgroundColor: Colors.redAccent,
+              child: const Icon(Icons.refresh),
+            ),
+            const Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+
+
+                });
+              },
+              tooltip: 'Green_Score',
+              backgroundColor: Colors.amber,
+              child: Text("${state.yScore}"),
+            ),
+            const Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+
+
+                });
+              },
+              tooltip: 'Green_Score',
+              backgroundColor: Colors.green,
+              child: Text("${state.gScore}"),
+            ),
+
+            const Spacer(flex: 2)
+          ]
           ),
-          const Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-
-
-              });
-            },
-            tooltip: 'Green_Score',
-            backgroundColor: Colors.amber,
-            child: Text("${state.yScore}"),
-          ),
-          const Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-
-
-              });
-            },
-            tooltip: 'Green_Score',
-            backgroundColor: Colors.green,
-            child: Text("${state.gScore}"),
-          ),
-
-          const Spacer(flex: 2)
-        ]
-        ),
-        Spacer()
-      ]),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          Spacer()
+        ]),
+      ),
     );
   }
 }
