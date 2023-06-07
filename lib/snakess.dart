@@ -119,14 +119,14 @@ List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, in
 }
 
 GState GenerateGState(int row, int col) {
-  print("STARTGSTATE\n");
+
   GState state = GState(true, 0, col-1, row-1, 0, row, col);
   state.pos =   List.generate(
       row, (i) => List.filled(col, 0, growable: false),
       growable: false);
   state.pos[0][col-1] = 1;
   state.pos[row-1][0] = -1;
-  print("1\n");
+
   state.yMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
@@ -136,12 +136,12 @@ GState GenerateGState(int row, int col) {
   for( var i = 0; i < row - 1; i++ ) {
     state.yMoves[i][0] = true;
   }
-  print("1.5\n");
+
   for( var i = 1; i < row - 1; i++ ) {
     if (i == row || col - 1 - i < 0) break;
     state.yMoves[i][col - 1 - i] = true;
   }
-  print("2\n");
+
   state.gMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
@@ -156,7 +156,7 @@ GState GenerateGState(int row, int col) {
     state.gMoves[i][col - 1 - i] = true;
   }
   state.cMoves = state.gMoves;
-  print("4\n");
+
   return state;
 }
 
@@ -179,7 +179,6 @@ String whereIsHead(int x, int y,GState state) {
 }
 
 List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y, GState state) func) {
-  print("start1\n");
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => SizedBox(
@@ -212,12 +211,12 @@ List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y,
               child: null,
             )));
   }
-  print("done1\n");
+
   return toReturn;
 }
 
 List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y, GState state) func) {
-  print("start2\n");
+
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => SizedBox(
@@ -250,12 +249,12 @@ List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y
                         height: 20,
                         child: FloatingActionButton(onPressed: () {})))) ))));
   }
-  print("done2\n");
+
   return toReturn;
 }
 
 List<Row> listMaker3(int row, int col, GState state, Function(int x, int y, GState state) func) {
-  print("start3\n");
+
   late var toReturn = List.generate(
       row,
           (i) => Row(
@@ -269,7 +268,7 @@ List<Row> listMaker3(int row, int col, GState state, Function(int x, int y, GSta
           children: listMaker2(i, col, state, (i, col, state) => func(i, col, state)),
         ));
   }
-  print("done3\n");
+
   return toReturn;
 }
 
