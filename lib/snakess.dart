@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class GState {
@@ -10,18 +12,40 @@ class GState {
   int col;
   int gScore = 0;
   int yScore = 0;
+  String result = "";
+  bool gMobility = true;
+  bool yMobility = true;
   List<List<int>> pos = [];
   List<List<bool>> gMoves = [];
   List<List<bool>> yMoves = [];
-  MaterialColor c = Colors.green;
-  MaterialAccentColor ac = Colors.greenAccent;
+  List<List<bool>> cMoves = [];
   GState(this.greenTurn, this.gHeadX, this.gHeadY, this.yHeadX, this.yHeadY, this.row, this.col);
 }
 
 Map<int, Color> setColor = {
-  -1: Colors.green,
+  -1: Colors.amber,
   0: Colors.lightBlue,
-  1: Colors.amber,
+  1: Colors.green,
+};
+
+Map<bool, Color> setPlayerCol  = {
+  false: Colors.amber,
+  true: Colors.green,
+};
+
+Map<bool, Color> setColorGSPlash = {
+  false: Colors.redAccent,
+  true: Colors.greenAccent,
+};
+
+Map<bool, Color> setColorASPlash = {
+  false: Colors.redAccent,
+  true: Colors.amberAccent,
+};
+
+Map<bool, Map<bool, Color>> setColorSplash  = {
+  false: setColorASPlash,
+  true: setColorGSPlash,
 };
 
 class MyWidget extends StatefulWidget {
@@ -34,15 +58,17 @@ class MyWidget extends StatefulWidget {
   }
 }
 
-List<List<bool>> UpdateGState(int row, int col, List<List<int>> pos, int xHeadX, int xHeadY){
+List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, int xHeadY){
   List<List<bool>> xMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
-
+//print("--xmoves:--\n");
+  bool moves = false;
   // poziome ustalnie pozycji
   for (var i = 0; i < col; i++) {
     if (pos[xHeadX][i] == 0) {
       xMoves[xHeadX][i] = true;
+      moves = true;
     }
   }
 
@@ -50,16 +76,65 @@ List<List<bool>> UpdateGState(int row, int col, List<List<int>> pos, int xHeadX,
   for (var i = 0; i < row; i++) {
     if (pos[i][xHeadY] == 0) {
       xMoves[i][xHeadY] = true;
+      moves = true;
     }
   }
+  //print("Heads: $xHeadX, $xHeadY \n");
+  // na skos w z dołu w prawo
+  int delta = min(xHeadY, row-1-xHeadX);
+  int px = xHeadX + delta;
+  int py = xHeadY - delta;
+/*  int px = (xHeadX + xHeadY);
+  if (px > row-1) px = row-1;
+  int py = (xHeadX + xHeadY) - col + 1;
+  if (py<0) py = 0;*/
+  //print("dl to ur: $px, $py \n");
+  while(px != -1 && py != col) {
+    if (pos[px][py] == 0) {
+      xMoves[px][py] = true;
+      moves = true;
+    }
+    py+=1;
+    px-=1;
+  }
 
-  // na skos w prawo
+  //na skos z góry na prawo
+  delta = min(xHeadY, xHeadX);
+  px = xHeadX - delta;
+  py = xHeadY - delta;
+/*  px = (xHeadX - xHeadY);
+  if (px < 0) px = 0;
+  py = (xHeadY - xHeadX);
+  if (py < 0) py = 0;*/
+  //print("ul to dr: $px, $py \n");
+  while(px != row && py != col) {
+    if (pos[px][py] == 0) {
+      xMoves[px][py] = true;
+      moves = true;
+    }
+    py+=1;
+    px+=1;
+  }
+  return [xMoves,moves];
+}
 
+List<List<int>> monoListPost(int row, int col, int winner) {
+  List<List<int>> ret;
+  if (winner == 0) {
+      ret = List.generate(
+        row, (i) => List.filled(col, 1 -2* (i%2), growable: false));
 
-  return xMoves;
+  }
+  else {
+    ret  = List.generate(
+        row, (i) => List.filled(col, winner, growable: false));
+
+  }
+   return ret;
 }
 
 GState GenerateGState(int row, int col) {
+
   GState state = GState(true, 0, col-1, row-1, 0, row, col);
   state.pos =   List.generate(
       row, (i) => List.filled(col, 0, growable: false),
@@ -76,7 +151,9 @@ GState GenerateGState(int row, int col) {
   for( var i = 0; i < row - 1; i++ ) {
     state.yMoves[i][0] = true;
   }
+
   for( var i = 1; i < row - 1; i++ ) {
+    if (i == row || col - 1 - i < 0) break;
     state.yMoves[i][col - 1 - i] = true;
   }
 
@@ -90,8 +167,11 @@ GState GenerateGState(int row, int col) {
     state.gMoves[i][col-1] = true;
   }
   for( var i = 1; i < row - 1; i++ ) {
+    if (i == row || col - 1 - i < 0) break;
     state.gMoves[i][col - 1 - i] = true;
   }
+  state.cMoves = state.gMoves;
+
   return state;
 }
 
@@ -102,76 +182,19 @@ class MyFloatingActionButton extends FloatingActionButton {
       {super.key, required super.onPressed, super.child, super.backgroundColor, super.splashColor});
 }
 
-void matrixColorUpdate(GState state, List<List<MaterialColor>> mat) {
-  List<List<int>> allowed = state.pos;
-
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == 0) {
-        mat[j][i] = Colors.lightBlue;
-      } else if (allowed[j][i] == 1 ) {
-        mat[j][i] = Colors.green;
-      } else {
-        mat[j][i] = Colors.amber;
-      }
-    }
+String whereIsHead(int x, int y,GState state) {
+  String ret = "";
+  if (x == state.gHeadX && y == state.gHeadY) {
+    ret += "S";
   }
-}
-
-List<List<MaterialColor>> matrixColorSet(GState state) {
-  List<List<int>> allowed = state.pos;
-  var toReturn = List.generate(
-      state.row, (i) => List.filled(state.col, Colors.lightBlue, growable: false),
-      growable: false);
-
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == 0) {
-        toReturn[j][i] = Colors.lightBlue;
-      } else if (allowed[j][i] == 1 ) {
-        toReturn[j][i] = Colors.green;
-      } else {
-        toReturn[j][i] = Colors.amber;
-      }
-    }
+  if (x == state.yHeadX && y == state.yHeadY) {
+    ret += "S";
   }
-
-  return toReturn;
-}
-
-List<List<MaterialAccentColor>> matrixColorSplashSet(GState state) {
-  List<List<bool>> allowed = state.yMoves;
-  if (state.greenTurn) {
-    allowed = state.gMoves;
-  }
-  var toReturn = List.generate(
-      state.row, (i) => List.filled(state.col,Colors.redAccent, growable: true),
-      growable: false);
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == true) toReturn[j][i] = state.ac;
-    }
-  }
-
-  return toReturn;
+  return ret;
 }
 
 
-void matrixColorSplashUpdate(GState state, List<List<MaterialAccentColor>> mat) {
-  List<List<bool>> allowed = state.yMoves;
-  if (state.greenTurn) {
-    allowed = state.gMoves;
-  }
-  for( var i = 0; i < state.col; i++ ) {
-    for( var j = 0; j < state.row; j++ ) {
-      if (allowed[j][i] == true) mat[j][i] = state.ac;
-    }
-  }
-
-
-}
-
-List<SizedBox> listMaker(List<List<MaterialColor>> mainCM, List<List<MaterialAccentColor>> mainCS, int row, int col, GState state,  Function(int x, int y, GState state) func) {
+List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y, GState state) func) {
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => SizedBox(
@@ -183,9 +206,10 @@ List<SizedBox> listMaker(List<List<MaterialColor>> mainCM, List<List<MaterialAcc
             onPressed: () {
               func(row, i % col, state);
             },
-            backgroundColor: mainCM[row][i % col],
-            splashColor: mainCS[row][i % col],
-            child: Text("($row, ${i % col})"),
+            backgroundColor: setColor[state.pos[row][i % col]],
+            splashColor: (setColorSplash[state.greenTurn])![state.cMoves[row][i % col]],
+            //child: Text("($row, ${i % col})"),
+            child: Text(whereIsHead(row, i % col, state)),
           )));
 
   for (var i = col - 1; i >= 1; i -= 1) {
@@ -203,10 +227,12 @@ List<SizedBox> listMaker(List<List<MaterialColor>> mainCM, List<List<MaterialAcc
               child: null,
             )));
   }
+
   return toReturn;
 }
 
 List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y, GState state) func) {
+
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => SizedBox(
@@ -239,14 +265,16 @@ List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y
                         height: 20,
                         child: FloatingActionButton(onPressed: () {})))) ))));
   }
+
   return toReturn;
 }
 
-List<Row> listMaker3(List<List<MaterialColor>> mainCM, List<List<MaterialAccentColor>> mainCS, int row, int col, GState state, Function(int x, int y, GState state) func) {
+List<Row> listMaker3(int row, int col, GState state, Function(int x, int y, GState state) func) {
+
   late var toReturn = List.generate(
-      col,
+      row,
           (i) => Row(
-        children: listMaker(mainCM, mainCS, i, col, state, (i, col, state) => func(i, col, state)),
+        children: listMaker(i, col, state, (i, col, state) => func(i, col, state)),
       ));
 
   for (var i = row - 1; i >= 1; i -= 1) {
@@ -280,14 +308,8 @@ class _MyHomePageState extends State<Snakess> {
 
   static int row = 5;
   static int col = 5;
+
   late GState state = GenerateGState(row, col);
-  late var movesMatrix = List.generate(
-      row, (i) => List.filled(col, 0, growable: false),
-      growable: false);
-
-  late var mainColorMatrix = matrixColorSet(state);
-  late var mainColorSplash = matrixColorSplashSet(state);
-
 
 
   void _makeTurn(int x, int y, GState state) {
@@ -299,21 +321,24 @@ class _MyHomePageState extends State<Snakess> {
       // called again, and so nothing would appear to happen.
       int posToken = -1;
       List<List<bool>> allowed = state.yMoves;
-
       List<List<bool>> enemy_allowed = state.gMoves;
       int myHeadX = state.yHeadX;
       int myHeadY = state.yHeadY;
+
+      int toadd = 0;
       if (state.greenTurn) {
+
         allowed = state.gMoves;
         enemy_allowed = state.yMoves;
         posToken = 1;
         myHeadX = state.gHeadX;
         myHeadY = state.gHeadY;
       }
-      print("HeadX: $myHeadX, HeadY: $myHeadY\n");
-      print("x: $x, y: $y\n");
+      //print("HeadX: $myHeadX, HeadY: $myHeadY\n");
+      //print("x: $x, y: $y\n");
       int newHeadX = x;
       int newHeadY = y;
+
       if (allowed[x][y]) {
         //poruszanie się
         int toAddX = -1;
@@ -330,41 +355,73 @@ class _MyHomePageState extends State<Snakess> {
         if (y == myHeadY) {
           toAddY = 0;
         }
-        print("to add $toAddX, $toAddY\n");
+        //print("to add $toAddX, $toAddY\n");
         do {
-
+          if (state.pos[x][y]  == -posToken) toadd = 1;
           state.pos[x][y] = posToken;
           enemy_allowed[x][y] = false;
           allowed[x][y] = false;
           x+= toAddX;
           y+= toAddY;
-          print("Pos added x: $x, y: $y\n");
+          //print("Pos added x: $x, y: $y\n");
         } while (x != myHeadX || y != myHeadY);
         // aktualizacja allowed:
         //Uwaga!!! Od nowa trzeba zrobić cały na false!!! Najlepiej zrobić funkcję, której ”edziemożna
         // użyć też przy inicjacji i tutaj...
         //
         state.greenTurn = !state.greenTurn;
+
         if (state.greenTurn == true) { //ruch wykonał żółty
+          state.yScore += toadd;
           state.yHeadX = newHeadX;
           state.yHeadY = newHeadY;
+          var updated =  UpdateXState(state.row,state.col, state.pos, state.gHeadX, state.gHeadY);
+          state.gMoves = updated[0];
+          state.gMobility = updated[1];
+          state.cMoves = state.gMoves;
 
-          state.c = Colors.green;
-          state.ac = Colors.greenAccent;
+          if (updated[1] == false) {
+            state.greenTurn = false;
+            var updated =  UpdateXState(state.row,state.col, state.pos, state.yHeadX, state.yHeadY);
+            state.yMoves = updated[0];
+            state.yMobility = updated[1];
+            state.cMoves = state.yMoves;
+          }
         }
         else{ //ruch wykonał zielony
           state.gHeadX = newHeadX;
           state.gHeadY = newHeadY;
+          state.gScore += toadd;
+          var updated = UpdateXState(state.row,state.col, state.pos, state.yHeadX, state.yHeadY);
+          state.yMoves = updated[0];
+          state.yMobility = updated[1];
+          state.cMoves = state.yMoves;
 
-          state.ac = Colors.amberAccent;
-          state.c = Colors.amber;
+          if (updated[1] == false) {
+            state.greenTurn = true;
+            var updated =  UpdateXState(state.row,state.col, state.pos, state.gHeadX, state.gHeadY);
+            state.gMoves = updated[0];
+            state.gMobility = updated[1];
+            state.cMoves = state.gMoves;
+          }
         }
 
-
+        if (! state.yMobility || ! state.gMobility) {
+          if (state.gScore > state.yScore && state.yMobility == false){
+            state.result = "Green wins!!!";
+            state.pos =  monoListPost(state.row, state.col, 1);
+          }
+          else if (state.gScore < state.yScore && state.gMobility == false) {
+            state.result = "Yellow wins!!!";
+            state.pos =  monoListPost(state.row, state.col, -1);
+          }
+          else if (state.gMobility == false && state.yMobility == false) {
+            state.result = "Remis!!!";
+            state.pos =  monoListPost(state.row, state.col, 0);
+          }
+        }
       }
-      mainColorMatrix = matrixColorSet(state);
-      mainColorSplash = matrixColorSplashSet(state);
-
+      //print("states: ${state.gMobility}, ${state.yMobility}");
     });
   }
 
@@ -373,7 +430,7 @@ class _MyHomePageState extends State<Snakess> {
   @override
   Widget build(BuildContext context) {
     late var buttonColumn =
-    listMaker3(mainColorMatrix, mainColorSplash, row, col, state, (i, col, state) => _makeTurn(i, col, state));
+    listMaker3(row, col, state, (i, col, state) => _makeTurn(i, col, state));
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -387,83 +444,77 @@ class _MyHomePageState extends State<Snakess> {
         title: Center(child: Text(widget.title)),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                color: Colors.lightBlueAccent,
-                child: Column(children: buttonColumn)),
-          ),
-        ),
-      ),
-      floatingActionButton:
-      Column(children: [Spacer(flex: 50),
-        Text(
-          '${state.greenTurn}',
-
-        ),
-        Spacer(),
-        Row(children: [
-          Spacer(flex:2),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-
-
-              });
-            },
-            tooltip: 'Player',
-            backgroundColor: state.c,
-            child: const Icon(Icons.accessibility_new),
+        child: Column(children:  <Widget>[Spacer(),
+          Text(
+            '${state.result}',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                state = GenerateGState(row, col);
-                movesMatrix = List.generate(
-                    row, (i) => List.filled(col, 0, growable: false),
-                    growable: false);
-                mainColorMatrix = matrixColorSet(state);
-                mainColorSplash = matrixColorSplashSet(state);
-              });
-            },
-            tooltip: 'Reset',
-            backgroundColor: Colors.redAccent,
-            child: const Icon(Icons.refresh),
+          Expanded(flex: 10,child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                  color: Colors.lightBlueAccent,
+                  child: Column(children: buttonColumn)),
+            ),
+          ),),
+          Spacer(),
+          Row(children: [
+            Spacer(flex:2),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+
+
+                });
+              },
+              tooltip: 'Player',
+              backgroundColor: setPlayerCol[state.greenTurn],
+              child: const Icon(Icons.accessibility_new),
+            ),
+            Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  state = GenerateGState(row, col);
+                });
+              },
+              tooltip: 'Reset',
+              backgroundColor: Colors.redAccent,
+              child: const Icon(Icons.refresh),
+            ),
+            const Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+
+
+                });
+              },
+              tooltip: 'Green_Score',
+              backgroundColor: Colors.amber,
+              child: Text("${state.yScore}"),
+            ),
+            const Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+
+
+                });
+              },
+              tooltip: 'Green_Score',
+              backgroundColor: Colors.green,
+              child: Text("${state.gScore}"),
+            ),
+
+            const Spacer(flex: 2)
+          ]
           ),
-          const Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-
-
-              });
-            },
-            tooltip: 'Green_Score',
-            backgroundColor: Colors.amber,
-            child: Text("${state.yScore}"),
-          ),
-          const Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-
-
-              });
-            },
-            tooltip: 'Green_Score',
-            backgroundColor: Colors.green,
-            child: Text("${state.gScore}"),
-          ),
-
-          const Spacer(flex: 2)
-        ]
-        ),
-        Spacer()
-      ]),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          Spacer()
+        ]),
+      ),
     );
   }
 }

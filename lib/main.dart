@@ -3,8 +3,8 @@ import 'tic-tac-toe.dart';
 import 'dots_and_boxes.dart';
 import 'snakess.dart';
 
-const bgColor = Color(0xFFFCEE0C);
-const highlightColor = Color(0xFF03D8F3);
+const bgColor =Colors.white;
+const highlightColor = Colors.lightBlue;
 
 void main() {
   runApp(const MaterialApp(
