@@ -64,7 +64,10 @@ class Home extends StatelessWidget {
                           ),
                           onTap: () {
                             Navigator.of(context).pop();
-                            showHowToPlay(context, 'todo how to play');
+                            showHowToPlay(context, '1. Players take turns connecting two adjacent dots with a line.\n'
+                            '2. When a player completes a box, they claim it and get an extra turn.\n'
+                            '3. The game ends when all dots are connected.\n'
+                            '4. The player with the most claimed boxes wins.\n');
                           },
                         ),
                         ListTile(
