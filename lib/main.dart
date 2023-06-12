@@ -18,49 +18,142 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgColor,
-      floatingActionButton: FloatingActionButton(
         backgroundColor: bgColor,
-        elevation: 0,
-        onPressed: () {},
-        child: const Icon(
-          Icons.settings,
-          color: highlightColor,
-          size: 50,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "GAMES :D",
-                        style: TextStyle(
-                          fontSize: constraints.maxWidth * 0.45,
-                          color: highlightColor,
-                        ),
+        floatingActionButton: FloatingActionButton(
+            backgroundColor: highlightColor,
+            elevation: 0,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text(
+                      'How to play',
+                      style: TextStyle(
+                        fontSize: 40,
+                        color: highlightColor,
+                        backgroundColor: bgColor,
                       ),
-                    );
-                  },
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: const Text(
+                            'Tic-Tac-Toe',
+                            style: TextStyle(
+                              fontSize: 30,
+                              color: highlightColor,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            showHowToPlay(
+                                context,
+                                'Tic-Tac-Toe is a classic game played on a 3x3 grid. The game involves two players, represented by X and O, taking turns to mark empty cells on the grid. The objective is to form a line of three of your own marks (horizontally, vertically, or diagonally) before the opponent does.\n\n'
+                                    'The game starts with an empty grid, and players take turns placing their marks in any available cell. Once a player successfully forms a line of three marks, they win the game. If all cells are filled without any player achieving a winning line, the game ends in a draw. The game can be played repeatedly, with players taking turns to make their moves until a winner is determined or the game ends in a draw.');
+                          },
+                        ),
+                        ListTile(
+                          title: const Text(
+                            'Dots and Boxes',
+                            style: TextStyle(
+                              fontSize: 30,
+                              color: highlightColor,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            showHowToPlay(context, 'todo how to play');
+                          },
+                        ),
+                        ListTile(
+                          title: const Text(
+                            'Snakes',
+                            style: TextStyle(
+                              fontSize: 30,
+                              color: highlightColor,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            showHowToPlay(context, 'todo how to play');
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: const Icon(
+              Icons.question_mark_outlined,
+              color: bgColor,
+              size: 50,
+            )),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+        body: Center(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                        width: double.infinity,
+                        child: LayoutBuilder(
+                          builder: (BuildContext context,
+                              BoxConstraints constraints) {
+                            return FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "GAMES",
+                                style: TextStyle(
+                                  fontSize: constraints.maxWidth * 0.45,
+                                  // height: 0.5,
+                                  color: highlightColor,
+                                ),
+                              ),
+                            );
+                          },
+                        ))),
+                GameButton("tic-tac-toe"),
+                GameButton("dots-and-boxes"),
+                GameButton("snakess"),
+              ]),
+        ));
+  }
+
+  void showHowToPlay(BuildContext context, String text) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      color: highlightColor,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
                 ),
-              ),
+                Text(
+                  text,
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ],
             ),
-            GameButton("tic-tac-toe"),
-            GameButton("dots-and-boxes"),
-            GameButton("snakess"),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -85,7 +178,7 @@ class GameButton extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          const MyHomePage(title: 'Gomoku')), // or Gomoku()
+                      const MyHomePage(title: 'Gomoku')), // or Gomoku()
                 );
                 break;
               case "dots-and-boxes":
@@ -104,7 +197,7 @@ class GameButton extends StatelessWidget {
                       const Snakess(title: 'Snakess')), // or Gomoku()
                 );
                 break;
-              // add more cases for each game
+            // add more cases for each game
               default:
                 break;
             }
