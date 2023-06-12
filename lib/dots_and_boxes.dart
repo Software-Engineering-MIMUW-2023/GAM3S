@@ -206,6 +206,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
   }
 
   bool _check_borders(int x, int y, int c) {
+    bool to_return = false;
     if (x % 2 == 0) {
       if (x - 2 >= 0) {
         if (_isFieldOccupied(x - 1, y - 1, state.occupied) &&
@@ -213,7 +214,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x - 2, y, state.occupied)) {
           state.occupied[x-1][y] = c;
           _add_point();
-          return true;
+          to_return =  true;
         }
       }
       if (x + 2 <= 2 * row - 2) {
@@ -222,7 +223,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x + 2, y, state.occupied)) {
           state.occupied[x+1][y] = c;
           _add_point();
-          return true;
+          to_return =  true;
         }
       }
     }
@@ -233,7 +234,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x, y - 2, state.occupied)) {
           state.occupied[x][y - 1] = c;
           _add_point();
-          return true;
+          to_return =  true;
         }
       }
       if (y + 2 <= 2 * col - 2) {
@@ -242,11 +243,11 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x, y + 2, state.occupied)) {
           state.occupied[x][y + 1] = c;
           _add_point();
-          return true;
+          to_return =  true;
         }
       }
     }
-    return false;
+    return to_return;
   }
 
   void _makeTurn(int x, int y, GState stateLoc) {
