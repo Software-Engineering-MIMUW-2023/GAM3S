@@ -18,6 +18,7 @@ class GState {
   int gScore;
   int yScore;
   int occupiedAmount = 0;
+  String result = "";
   List<List<int>> occupied = []; // -1 - green, 0 - nobody, 1 - yellow
   MaterialColor c = Colors.green;
   MaterialAccentColor ac = Colors.greenAccent;
@@ -85,7 +86,7 @@ List<Padding> listMaker(
                   func(row, i % col, state);
                 },
                 backgroundColor: setColor[state.occupied[row][i % col]],
-                child: Text("($row, ${i % col})"),
+                // child: Text("($row, ${i % col})"),
               ))));
 
   return toReturn;
@@ -124,12 +125,12 @@ class _MyHomePageState extends State<MyHomePage> {
   static int row = 15;
   static int col = 15;
   static Pair startFields = Pair(7, 7);
-  late GState state = GenerateGState(row, col, 0, 0);
+  late GState state = GenerateGState(true, row, col, 0, 0);
 
   List<Pair> sides = [Pair(-1, 0), Pair(-1, -1), Pair(0, -1), Pair(1, -1)];
 
-  GState GenerateGState(int row, int col, gScore, yScore) {
-    GState state = GState(true, row, col, gScore, yScore);
+  GState GenerateGState(bool greenTurn, int row, int col, gScore, yScore) {
+    GState state = GState(greenTurn, row, col, gScore, yScore);
 
     state.occupied = List.generate(
         row, (i) => List.filled(col, 0, growable: false),
@@ -158,31 +159,23 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _checkWinCondition(int x, int y, List<List<int>> occupied) {
     int c = occupied[x][y];
 
-    // print("next: \n");
     for (int i = 0; i < 4; i++) {
-      // print("i: $i");
-      // sprawdzanie 4 opcji zwycięstwa
       int score = 1;
       bool side1Returned0 = false;
       bool side2Returned0 = false;
-      // trzeba spawdzic do 4 wartości z każdej strony
       for (int j = 1; j <= 4; j++) {
-        // print("j: $j");
         if (!side1Returned0) {
           int res = checkOneSide(c, occupied, x, y, j, i, 1);
-          // print("side1Returned0: $res");
           score += res;
           side1Returned0 = res == 0;
         }
 
         if (!side2Returned0) {
           int res = checkOneSide(c, occupied, x, y, j, i, -1);
-          // print("side2Returned0: $res");
           score += res;
           side2Returned0 = res == 0;
         }
       }
-      // print("sore: $score");
 
       if (score >= 5) {
         return true;
@@ -205,22 +198,33 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if (!_isFieldOccupied(x, y, state.occupied)) {
+        if (x == startFields.get(0) && y == startFields.get(1)) {
+          state.result = "";
+        }
+
         state.occupied[x][y] = c;
         state.occupiedAmount++;
 
         if (_checkWinCondition(x, y, state.occupied)) {
           state = GenerateGState(
+              !state.greenTurn,
               row,
               col,
               state.greenTurn ? 1 + state.gScore : state.gScore,
               state.greenTurn ? state.yScore : 1 + state.yScore);
+
+          if (state.greenTurn) {
+            state.result = "Yellow wins!!!";
+          } else {
+            state.result = "Green wins!!!";
+          }
         } else {
           if (state.occupiedAmount >= row * col) {
-            state = GenerateGState(row, col, state.gScore, state.yScore);
+            state = GenerateGState(true, row, col, state.gScore, state.yScore);
+          } else {
+            state.greenTurn = !state.greenTurn;
           }
         }
-
-        state.greenTurn = !state.greenTurn;
       }
     });
   }
@@ -235,66 +239,70 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Center(child: Text(widget.title)),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                color: Colors.lightBlueAccent,
-                child: Column(children: buttonColumn)),
-          ),
-        ),
-      ),
-      floatingActionButton: Column(children: [
-        Spacer(flex: 50),
-        Text(
-          '${state.greenTurn}',
-        ),
-        Spacer(),
-        Row(children: [
-          Spacer(flex: 2),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {});
-            },
-            tooltip: 'Player',
-            backgroundColor: state.c,
-            child: const Icon(Icons.accessibility_new),
+        child: Column(children: [
+          Spacer(),
+          Text(
+            '${state.result}',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                state = GenerateGState(row, col, 0, 0);
-              });
-            },
-            tooltip: 'Reset',
-            backgroundColor: Colors.redAccent,
-            child: const Icon(Icons.refresh),
+          Expanded(
+            flex: 10,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
+                    color: Colors.lightBlueAccent,
+                    child: Column(children: buttonColumn)),
+              ),
+            ),
           ),
-          const Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {});
-            },
-            tooltip: 'Green_Score',
-            backgroundColor: Colors.amber,
-            child: Text("${state.yScore}"),
-          ),
-          const Spacer(),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {});
-            },
-            tooltip: 'Green_Score',
-            backgroundColor: Colors.green,
-            child: Text("${state.gScore}"),
-          ),
-          const Spacer(flex: 2)
+          Spacer(),
+          Row(children: [
+            Spacer(flex: 2),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {});
+              },
+              tooltip: 'Player',
+              backgroundColor: state.greenTurn ? setColor[-1] : setColor[1],
+              child: const Icon(Icons.accessibility_new),
+            ),
+            Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  state = GenerateGState(true, row, col, 0, 0);
+                });
+              },
+              tooltip: 'Reset',
+              backgroundColor: Colors.redAccent,
+              child: const Icon(Icons.refresh),
+            ),
+            const Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {});
+              },
+              tooltip: 'Yellow_Score',
+              backgroundColor: setColor[1],
+              child: Text("${state.yScore}"),
+            ),
+            const Spacer(),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {});
+              },
+              tooltip: 'Green_Score',
+              backgroundColor: Colors.green,
+              child: Text("${state.gScore}"),
+            ),
+            const Spacer(flex: 2)
+          ]),
+          Spacer()
         ]),
-        Spacer()
-      ]),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      ),
     );
   }
 }
