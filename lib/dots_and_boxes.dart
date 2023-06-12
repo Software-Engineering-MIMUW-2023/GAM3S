@@ -205,7 +205,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
     }
   }
 
-  void _check_borders(int x, int y, int c) {
+  bool _check_borders(int x, int y, int c) {
     if (x % 2 == 0) {
       if (x - 2 >= 0) {
         if (_isFieldOccupied(x - 1, y - 1, state.occupied) &&
@@ -213,6 +213,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x - 2, y, state.occupied)) {
           state.occupied[x-1][y] = c;
           _add_point();
+          return true;
         }
       }
       if (x + 2 <= 2 * row - 2) {
@@ -221,6 +222,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x + 2, y, state.occupied)) {
           state.occupied[x+1][y] = c;
           _add_point();
+          return true;
         }
       }
     }
@@ -231,6 +233,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x, y - 2, state.occupied)) {
           state.occupied[x][y - 1] = c;
           _add_point();
+          return true;
         }
       }
       if (y + 2 <= 2 * col - 2) {
@@ -239,9 +242,11 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x, y + 2, state.occupied)) {
           state.occupied[x][y + 1] = c;
           _add_point();
+          return true;
         }
       }
     }
+    return false;
   }
 
   void _makeTurn(int x, int y, GState stateLoc) {
@@ -253,8 +258,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
 
       if (!_isFieldOccupied(x, y, state.occupied)) {
         state.occupied[x][y] = c;
-        _check_borders(x, y, c);
-        state.c = (setColor[-1 * c])!;
+        bool point = _check_borders(x, y, c);
         if (_checkWinCondition(x, y, state.occupied)) {
           state = GenerateGState(
               row,
@@ -266,8 +270,10 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             state = GenerateGState(row, col, state.gScore, state.yScore);
           }
         }
-
-        state.greenTurn = !state.greenTurn;
+        if (!point) {
+          state.c = (setColor[-1 * c])!;
+          state.greenTurn = !state.greenTurn;
+        }
       }
     });
   }
