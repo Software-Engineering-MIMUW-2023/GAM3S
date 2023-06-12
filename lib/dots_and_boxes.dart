@@ -19,7 +19,7 @@ class GState {
   int yScore;
   int occupiedAmount = 0;
   List<List<int>> occupied = []; // -1 - green, 0 - nobody, 1 - yellow
-  MaterialColor c = Colors.green;
+  Color c = Colors.green;
   MaterialAccentColor ac = Colors.greenAccent;
 
   GState(this.greenTurn, this.row, this.col, this.gScore, this.yScore);
@@ -50,7 +50,7 @@ List<SizedBox> listMaker(
   List<SizedBox> toReturn = List.generate(
       col,
           (i) => const SizedBox(
-        width: 20,
+          width: 20,
         height: 20,
       ));
 
@@ -58,7 +58,7 @@ List<SizedBox> listMaker(
     toReturn.insert(
         i,
         SizedBox(
-            width: 60,
+            width: 50,
             height: 20,
             child: MyFloatingActionButton(
               row,
@@ -69,8 +69,6 @@ List<SizedBox> listMaker(
               backgroundColor: setColor[state.occupied[row][2*i-1]],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
-              child: Text("($row, ${2*i - 1})"),
-
             )));
   }
   return toReturn;
@@ -83,7 +81,7 @@ List<SizedBox> listMaker2(
   for (var i = 0; i <= 2 * col - 2; i += 2) {
     toReturn.insert(i, SizedBox(
         width: 20,
-        height: 60,
+        height: 50,
         child: MyFloatingActionButton(
           row,
           i,
@@ -93,7 +91,6 @@ List<SizedBox> listMaker2(
           backgroundColor: setColor[state.occupied[row][i]],
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10)),
-          child: Text("($row, $i)"),
 
         )));
     //i+= 1;
@@ -101,8 +98,8 @@ List<SizedBox> listMaker2(
       toReturn.insert(
           i + 1,
           SizedBox(
-              width: 60,
-              height: 60,
+              width: 50,
+              height: 50,
               child: Container(
                 decoration: BoxDecoration(
                     color: (setColor[state.occupied[row][i+1]])!,
@@ -129,9 +126,9 @@ List<Row> listMaker3(
           i, col, state, (i, col, state) => func(i, col, state)),
     ));
   }
-  toReturn.insert(8, Row(
+  toReturn.insert(10, Row(
     children: listMaker(
-        8, col, state, (i, col, state) => func(i, col, state)),
+        10, col, state, (i, col, state) => func(i, col, state)),
   ));
   return toReturn;
 }
@@ -154,8 +151,8 @@ class DotsAndBoxes extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<DotsAndBoxes> {
-  static int row = 5;
-  static int col = 5;
+  static int row = 6;
+  static int col = 6;
   late GState state = GenerateGState(row, col, 0, 0);
 
   List<Pair> sides = [Pair(-1, 0), Pair(-1, -1), Pair(0, -1), Pair(1, -1)];
@@ -194,8 +191,8 @@ class _MyHomePageState extends State<DotsAndBoxes> {
   }
 
   bool _checkWinCondition(int x, int y, List<List<int>> occupied) {
-    int toWin = 8;
-    return (state.gScore > toWin || state.yScore > toWin);
+    int toWin = 13;
+    return (state.gScore >= toWin || state.yScore >= toWin);
   }
 
   void _add_point() {
@@ -257,12 +254,13 @@ class _MyHomePageState extends State<DotsAndBoxes> {
       if (!_isFieldOccupied(x, y, state.occupied)) {
         state.occupied[x][y] = c;
         _check_borders(x, y, c);
+        state.c = (setColor[-1 * c])!;
         if (_checkWinCondition(x, y, state.occupied)) {
           state = GenerateGState(
               row,
               col,
-              state.greenTurn ? 1 + state.gScore : state.gScore,
-              state.greenTurn ? state.yScore : 1 + state.yScore);
+              0,
+              0);
         } else {
           if (state.occupiedAmount == (row-1) * (col-1)) {
             state = GenerateGState(row, col, state.gScore, state.yScore);
@@ -296,9 +294,6 @@ class _MyHomePageState extends State<DotsAndBoxes> {
       ),
       floatingActionButton: Column(children: [
         Spacer(flex: 50),
-        Text(
-          '${state.greenTurn}',
-        ),
         Spacer(),
         Row(children: [
           Spacer(flex: 2),
