@@ -64,10 +64,10 @@ class Home extends StatelessWidget {
                           ),
                           onTap: () {
                             Navigator.of(context).pop();
-                            showHowToPlay(context, '1. Players take turns connecting two adjacent dots with a line.\n'
-                            '2. When a player completes a box, they claim it and get an extra turn.\n'
-                            '3. The game ends when all dots are connected.\n'
-                            '4. The player with the most claimed boxes wins.\n');
+                            showHowToPlay(context, 'Players take turns connecting two adjacent dots with a line.'
+                                'When a player completes a box, they claim it and get an extra turn.\n'
+                                'The game ends when all dots are connected.'
+                                'The player with the most claimed boxes wins.');
                           },
                         ),
                         ListTile(
@@ -80,11 +80,11 @@ class Home extends StatelessWidget {
                           ),
                           onTap: () {
                             Navigator.of(context).pop();
-                            showHowToPlay(context, "Snake Game Rules:\n\n"
-"The Snake game is played by two players. At the beginning of the game, each player's snake is located at one of the corners of the board and consists only of a head. The head of each snake is marked with the letter 'S'.\n\n"
-"During the game, players take turns moving their snakes on the board. To move a snake, a player must tap on an empty tile that is in the same row, column, or diagonal as the snake's head. The tile should not be already occupied by the other player.\n\n"
-"The goal of the game is to cross the enemy snake as many times as possible. The player with the highest number of crossings wins.\n\n"
-"To cross an enemy snake, a player must move their snake through the area where the enemy snake lies. This can be done by passing through the head, body, or tail of the enemy snake. In one turn, only one point can be gained by crossing the enemy snake, regardless of how many times it is crossed. There is no penalty for crossing your own snake.\n");
+                            showHowToPlay(context,
+                                "The Snake game is played by two players. At the beginning of the game, each player's snake is located at one of the corners of the board and consists only of a head. The head of each snake is marked with the letter 'S'.\n\n"
+                                "During the game, players take turns moving their snakes on the board. To move a snake, a player must tap on an empty tile that is in the same row, column, or diagonal as the snake's head. The tile should not be already occupied by the other player.\n\n"
+                                "The goal of the game is to cross the enemy snake as many times as possible. The player with the highest number of crossings wins.\n\n"
+                                "To cross an enemy snake, a player must move their snake through the area where the enemy snake lies. This can be done by passing through the head, body, or tail of the enemy snake. In one turn, only one point can be gained by crossing the enemy snake, regardless of how many times it is crossed. There is no penalty for crossing your own snake.");
                           },
                         ),
                       ],
@@ -114,10 +114,10 @@ class Home extends StatelessWidget {
                             return FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                "GAMES",
+                                "GAM3S",
                                 style: TextStyle(
-                                  fontSize: constraints.maxWidth * 0.45,
-                                  // height: 0.5,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 90,
                                   color: highlightColor,
                                 ),
                               ),
