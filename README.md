@@ -1,3 +1,5 @@
+[![Flutter Android](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml/badge.svg)](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml)
+
 # io_app
 
 A new Flutter project.
