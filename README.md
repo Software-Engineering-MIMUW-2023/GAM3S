@@ -12,8 +12,6 @@
     ·
     <a href="https://github.com/mikolajszym00"><strong>Mikołaj Szymański</strong></a>
   </p>
-
-  [![Flutter Android](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml/badge.svg)](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml)
 </p>
 
 [![Flutter Android](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml/badge.svg)](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml)

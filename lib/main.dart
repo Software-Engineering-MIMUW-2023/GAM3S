@@ -220,7 +220,7 @@ class GameButton extends StatelessWidget {
                 child: Text(
                   name,
                   style: TextStyle(
-                    fontSize: constraints.maxHeight * 0.5,
+                    fontSize: 40,
                     color: bgColor,
                   ),
                 ),
