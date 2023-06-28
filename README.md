@@ -14,6 +14,7 @@
   </p>
 </p>
 
+[![Cirrus CI - Specific Branch Build Status](https://img.shields.io/cirrus/github/Software-Engineering-MIMUW-2023/GAM3S/main)](https://cirrus-ci.com/github/Software-Engineering-MIMUW-2023/GAM3S)
 [![Flutter Android](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml/badge.svg)](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml)
 
 # io_app
