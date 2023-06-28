@@ -179,7 +179,7 @@ class MyFloatingActionButton extends FloatingActionButton {
   final int x;
   final int y;
   const MyFloatingActionButton(this.x, this.y,
-      {super.key, required super.onPressed, super.child, super.backgroundColor, super.splashColor});
+      {super.key, required super.onPressed, super.child, super.backgroundColor, super.splashColor, super.heroTag});
 }
 
 String whereIsHead(int x, int y,GState state) {
@@ -209,6 +209,7 @@ List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y,
             backgroundColor: setColor[state.pos[row][i % col]],
             splashColor: (setColorSplash[state.greenTurn])![state.cMoves[row][i % col]],
             //child: Text("($row, ${i % col})"),
+            heroTag: null,
             child: Text(whereIsHead(row, i % col, state)),
           )));
 
@@ -260,10 +261,10 @@ List<SizedBox> listMaker2(int row, int col, GState state,  Function(int x, int y
             child: Column(
                 children: List.generate(
                     2,
-                        (i) =>Row(children: List.generate(2, (i) => SizedBox(
+                        (j) =>Row(children: List.generate(2, (j) => SizedBox(
                         width: 20,
                         height: 20,
-                        child: FloatingActionButton(onPressed: () {})))) ))));
+                        child: FloatingActionButton(heroTag:null, onPressed: () {})))) ))));
   }
 
   return toReturn;
@@ -463,6 +464,7 @@ class _MyHomePageState extends State<Snakess> {
           Row(children: [
             Spacer(flex:2),
             FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 setState(() {
 
@@ -475,6 +477,7 @@ class _MyHomePageState extends State<Snakess> {
             ),
             Spacer(),
             FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 setState(() {
                   state = GenerateGState(row, col);
@@ -486,6 +489,7 @@ class _MyHomePageState extends State<Snakess> {
             ),
             const Spacer(),
             FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 setState(() {
 
@@ -498,6 +502,7 @@ class _MyHomePageState extends State<Snakess> {
             ),
             const Spacer(),
             FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 setState(() {
 
