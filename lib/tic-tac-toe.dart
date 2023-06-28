@@ -42,7 +42,8 @@ class MyFloatingActionButton extends FloatingActionButton {
       required super.onPressed,
       super.child,
       super.backgroundColor,
-      super.splashColor});
+      super.splashColor,
+      super.heroTag});
 }
 
 class Gomoku extends StatelessWidget {
@@ -86,6 +87,7 @@ List<Padding> listMaker(
                   func(row, i % col, state);
                 },
                 backgroundColor: setColor[state.occupied[row][i % col]],
+                heroTag: null,
                 // child: Text("($row, ${i % col})"),
               ))));
 
@@ -262,6 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Row(children: [
             Spacer(flex: 2),
             FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 setState(() {});
               },
@@ -271,6 +274,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Spacer(),
             FloatingActionButton(
+                heroTag: null,
               onPressed: () {
                 setState(() {
                   state = GenerateGState(true, row, col, 0, 0);
@@ -282,6 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const Spacer(),
             FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 setState(() {});
               },
@@ -291,6 +296,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const Spacer(),
             FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 setState(() {});
               },

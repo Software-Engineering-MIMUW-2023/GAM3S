@@ -42,7 +42,8 @@ class MyFloatingActionButton extends FloatingActionButton {
         super.child,
         super.backgroundColor,
         super.splashColor,
-        super.shape});
+        super.shape,
+        super.heroTag});
 }
 
 List<SizedBox> listMaker(
@@ -69,6 +70,7 @@ List<SizedBox> listMaker(
               backgroundColor: setColor[state.occupied[row][2*i-1]],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
+              heroTag: null,
             )));
   }
   return toReturn;
@@ -91,7 +93,7 @@ List<SizedBox> listMaker2(
           backgroundColor: setColor[state.occupied[row][i]],
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10)),
-
+          heroTag: null,
         )));
     //i+= 1;
     if (i < 2 * col - 2) {
@@ -305,6 +307,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
         Row(children: [
           Spacer(flex: 2),
           FloatingActionButton(
+            heroTag: null,
             onPressed: () {
               setState(() {});
             },
@@ -314,6 +317,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
           ),
           Spacer(),
           FloatingActionButton(
+            heroTag: null,
             onPressed: () {
               setState(() {
                 state = GenerateGState(row, col, 0, 0);
@@ -325,6 +329,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
           ),
           const Spacer(),
           FloatingActionButton(
+            heroTag: null,
             onPressed: () {
               setState(() {});
             },
@@ -334,6 +339,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
           ),
           const Spacer(),
           FloatingActionButton(
+            heroTag: null,
             onPressed: () {
               setState(() {});
             },
