@@ -1,3 +1,21 @@
+<p align="center">
+
+  <h1 align="center">GAM3S <br/> Flutter app with 3 exciting two-person games </h1>
+  <p align="center">
+    <a href="https://github.com/kornelhowil"><strong>Kornel Howil</strong></a>
+    ·
+    <a href="https://github.com/SaLukasik"><strong>Sara Łukasik</strong></a>
+    ·
+    <a href="https://github.com/radionroman"><strong>Radionov Roman</strong></a>
+    ·
+    <a href="https://github.com/emros43"><strong>Emilia Rosła</strong></a>
+    ·
+    <a href="https://github.com/mikolajszym00"><strong>Mikołaj Szymański</strong></a>
+  </p>
+
+  [![Flutter Android](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml/badge.svg)](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml)
+</p>
+
 [![Flutter Android](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml/badge.svg)](https://github.com/Software-Engineering-MIMUW-2023/insert-name/actions/workflows/flutter_actions_android.yml)
 
 # io_app
