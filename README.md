@@ -32,12 +32,12 @@ After that you can just open this repository in Android Studio, select yout Andr
 ## Run on your Android phone (stable)
 Just download .apk file which you can find in "apk/GAM3S.apk", put it on your phone and play!
 
-# Run on your Android phone (newest)
+## Run on your Android phone (newest)
 Follow steps above to run app on your computer. Then, select Build > Build Bundle(s)/APK(s) > Build APK(s) from the toolbar menu.
 Put generated .apk file on your phone and have fun :)
 
 
-## Diagrams
+# Diagrams
 
 ![image](https://user-images.githubusercontent.com/91662997/228355179-b377eaa5-008c-471d-9b81-8fcccb27eba9.png)
 
