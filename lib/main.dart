@@ -218,7 +218,7 @@ class GameButton extends StatelessWidget {
               return FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  name,
+                  'xd',
                   style: TextStyle(
                     fontSize: constraints.maxHeight * 0.5,
                     color: bgColor,
