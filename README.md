@@ -14,6 +14,9 @@
   </p>
 </p>
 
+<p align="center">
+<img src="https://github.com/Software-Engineering-MIMUW-2023/GAM3S/blob/main/logo.png" width=50% height=50%>
+</p>
 <br/><br/>
 
 [![Cirrus CI - Specific Branch Build Status](https://img.shields.io/cirrus/github/Software-Engineering-MIMUW-2023/GAM3S/main)](https://cirrus-ci.com/github/Software-Engineering-MIMUW-2023/GAM3S)
