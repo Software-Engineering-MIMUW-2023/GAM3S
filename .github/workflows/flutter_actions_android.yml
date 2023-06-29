@@ -21,7 +21,11 @@ jobs:
           # 11
           flutter-version: "3.7.8"
           channel: 'stable'
-      - name: Get dependencies
-        run: flutter pub get
-      - name: Start release build
-        run: flutter build appbundle
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+          architecture: x64
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build apk
+      - run: flutter build appbundle
