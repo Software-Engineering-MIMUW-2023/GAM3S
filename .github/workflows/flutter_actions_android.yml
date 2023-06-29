@@ -14,16 +14,16 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          distribution: "zulu"
-          java-version: "12.x"
+          distribution: 'zulu'
+          java-version: '12.x'
       - uses: subosito/flutter-action@v2
         with:
           # 11
           flutter-version: "3.7.8"
-          channel: "stable"
+          channel: 'stable'
           cache: true
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
-          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
           architecture: x64
       - run: flutter pub get
       - run: flutter test
