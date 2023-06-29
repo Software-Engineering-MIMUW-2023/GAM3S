@@ -21,7 +21,7 @@ class GState {
   List<List<int>> occupied = []; // -1 - green, 0 - nobody, 1 - yellow
   Color c = Colors.green;
   MaterialAccentColor ac = Colors.greenAccent;
-
+  String result = "";
   GState(this.greenTurn, this.row, this.col, this.gScore, this.yScore);
 }
 
@@ -38,22 +38,22 @@ class MyFloatingActionButton extends FloatingActionButton {
 
   const MyFloatingActionButton(this.x, this.y,
       {super.key,
-        required super.onPressed,
-        super.child,
-        super.backgroundColor,
-        super.splashColor,
-        super.shape,
-        super.heroTag});
+      required super.onPressed,
+      super.child,
+      super.backgroundColor,
+      super.splashColor,
+      super.shape,
+      super.heroTag});
 }
 
 List<SizedBox> listMaker(
     int row, int col, GState state, Function(int x, int y, GState state) func) {
   List<SizedBox> toReturn = List.generate(
       col,
-          (i) => const SizedBox(
-          width: 20,
-        height: 20,
-      ));
+      (i) => const SizedBox(
+            width: 20,
+            height: 20,
+          ));
 
   for (var i = col - 1; i >= 1; i -= 1) {
     toReturn.insert(
@@ -65,9 +65,9 @@ List<SizedBox> listMaker(
               row,
               i,
               onPressed: () {
-                func(row, 2*i-1, state);
+                func(row, 2 * i - 1, state);
               },
-              backgroundColor: setColor[state.occupied[row][2*i-1]],
+              backgroundColor: setColor[state.occupied[row][2 * i - 1]],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
               heroTag: null,
@@ -81,20 +81,22 @@ List<SizedBox> listMaker2(
   late var toReturn = <SizedBox>[];
 
   for (var i = 0; i <= 2 * col - 2; i += 2) {
-    toReturn.insert(i, SizedBox(
-        width: 20,
-        height: 50,
-        child: MyFloatingActionButton(
-          row,
-          i,
-          onPressed: () {
-            func(row, i, state);
-          },
-          backgroundColor: setColor[state.occupied[row][i]],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)),
-          heroTag: null,
-        )));
+    toReturn.insert(
+        i,
+        SizedBox(
+            width: 20,
+            height: 50,
+            child: MyFloatingActionButton(
+              row,
+              i,
+              onPressed: () {
+                func(row, i, state);
+              },
+              backgroundColor: setColor[state.occupied[row][i]],
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              heroTag: null,
+            )));
     //i+= 1;
     if (i < 2 * col - 2) {
       toReturn.insert(
@@ -104,9 +106,8 @@ List<SizedBox> listMaker2(
               height: 50,
               child: Container(
                 decoration: BoxDecoration(
-                    color: (setColor[state.occupied[row][i+1]])!,
-                    borderRadius: BorderRadius.all(Radius.circular(10))
-                ),
+                    color: (setColor[state.occupied[row][i + 1]])!,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
               )));
     }
   }
@@ -118,20 +119,26 @@ List<Row> listMaker3(
     int row, int col, GState state, Function(int x, int y, GState state) func) {
   late var toReturn = <Row>[];
   for (var i = 0; i < 2 * row - 2; i += 1) {
-    toReturn.insert(i, Row(
-      children: listMaker(
-          i, col, state, (i, col, state) => func(i, col, state)),
-    ));
+    toReturn.insert(
+        i,
+        Row(
+          children:
+              listMaker(i, col, state, (i, col, state) => func(i, col, state)),
+        ));
     i += 1;
-    toReturn.insert(i, Row(
-      children: listMaker2(
-          i, col, state, (i, col, state) => func(i, col, state)),
-    ));
+    toReturn.insert(
+        i,
+        Row(
+          children:
+              listMaker2(i, col, state, (i, col, state) => func(i, col, state)),
+        ));
   }
-  toReturn.insert(10, Row(
-    children: listMaker(
-        10, col, state, (i, col, state) => func(i, col, state)),
-  ));
+  toReturn.insert(
+      10,
+      Row(
+        children:
+            listMaker(10, col, state, (i, col, state) => func(i, col, state)),
+      ));
   return toReturn;
 }
 
@@ -163,7 +170,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
     GState state = GState(true, row, col, gScore, yScore);
 
     state.occupied = List.generate(
-        2*row-1, (i) => List.filled(2*col-1, 0, growable: false),
+        2 * row - 1, (i) => List.filled(2 * col - 1, 0, growable: false),
         growable: false);
 
     for (int i = 0; i < 2 * row - 2; i += 1) {
@@ -187,7 +194,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
     int newY = y + j * sides[i].get(1) * fac;
 
     return !(0 > newX || newX >= row || newY < 0 || newY >= col) &&
-        c == occupied[newX][newY]
+            c == occupied[newX][newY]
         ? 1
         : 0;
   }
@@ -201,8 +208,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
     state.occupiedAmount++;
     if (state.greenTurn) {
       state.gScore += 1;
-    }
-    else {
+    } else {
       state.yScore += 1;
     }
   }
@@ -214,29 +220,28 @@ class _MyHomePageState extends State<DotsAndBoxes> {
         if (_isFieldOccupied(x - 1, y - 1, state.occupied) &&
             _isFieldOccupied(x - 1, y + 1, state.occupied) &&
             _isFieldOccupied(x - 2, y, state.occupied)) {
-          state.occupied[x-1][y] = c;
+          state.occupied[x - 1][y] = c;
           _add_point();
-          to_return =  true;
+          to_return = true;
         }
       }
       if (x + 2 <= 2 * row - 2) {
         if (_isFieldOccupied(x + 1, y - 1, state.occupied) &&
             _isFieldOccupied(x + 1, y + 1, state.occupied) &&
             _isFieldOccupied(x + 2, y, state.occupied)) {
-          state.occupied[x+1][y] = c;
+          state.occupied[x + 1][y] = c;
           _add_point();
-          to_return =  true;
+          to_return = true;
         }
       }
-    }
-    else {
+    } else {
       if (y - 2 >= 0) {
         if (_isFieldOccupied(x - 1, y - 1, state.occupied) &&
             _isFieldOccupied(x + 1, y - 1, state.occupied) &&
             _isFieldOccupied(x, y - 2, state.occupied)) {
           state.occupied[x][y - 1] = c;
           _add_point();
-          to_return =  true;
+          to_return = true;
         }
       }
       if (y + 2 <= 2 * col - 2) {
@@ -245,7 +250,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
             _isFieldOccupied(x, y + 2, state.occupied)) {
           state.occupied[x][y + 1] = c;
           _add_point();
-          to_return =  true;
+          to_return = true;
         }
       }
     }
@@ -263,13 +268,14 @@ class _MyHomePageState extends State<DotsAndBoxes> {
         state.occupied[x][y] = c;
         bool point = _check_borders(x, y, c);
         if (_checkWinCondition(x, y, state.occupied)) {
-          state = GenerateGState(
-              row,
-              col,
-              0,
-              0);
+          if (state.yScore > state.gScore)
+            state.result = "Yellow wins!";
+          else if (state.yScore < state.gScore)
+            state.result = "Green wins!";
+          else
+            state.result = "Remis!";
         } else {
-          if (state.occupiedAmount == (row-1) * (col-1)) {
+          if (state.occupiedAmount == (row - 1) * (col - 1)) {
             state = GenerateGState(row, col, state.gScore, state.yScore);
           }
         }
@@ -291,15 +297,25 @@ class _MyHomePageState extends State<DotsAndBoxes> {
         title: Center(child: Text(widget.title)),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                color: Colors.white,
-                child: Column(children: buttonColumn)),
+        child: Column(children: [
+          Spacer(),
+          Text(
+            state.result,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-        ),
+          Spacer(),
+          Spacer(),
+          SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                  color: Colors.white, child: Column(children: buttonColumn)),
+            ),
+          ),
+          Spacer(),
+          Spacer(),
+        ]),
       ),
       floatingActionButton: Column(children: [
         Spacer(flex: 50),
@@ -349,7 +365,7 @@ class _MyHomePageState extends State<DotsAndBoxes> {
           ),
           const Spacer(flex: 2)
         ]),
-        Spacer()
+        const Spacer(),
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
