@@ -50,8 +50,8 @@ class Home extends StatelessWidget {
                             Navigator.of(context).pop();
                             showHowToPlay(
                                 context,
-                                'Tic-Tac-Toe is a classic game played on a 3x3 grid. The game involves two players, represented by X and O, taking turns to mark empty cells on the grid. The objective is to form a line of three of your own marks (horizontally, vertically, or diagonally) before the opponent does.\n\n'
-                                    'The game starts with an empty grid, and players take turns placing their marks in any available cell. Once a player successfully forms a line of three marks, they win the game. If all cells are filled without any player achieving a winning line, the game ends in a draw. The game can be played repeatedly, with players taking turns to make their moves until a winner is determined or the game ends in a draw.');
+                                'Gomoku (Tic-Tac-Toe), also known as "Five in a Row", is a strategic board game traditionally played on a Go board with a grid of 19x19 lines. This game involves two players, one handling the black stones and the other the white stones. To begin, the player with the black stones places the first stone at the intersection of the lines on the board. Subsequently, players alternate turns, placing one stone each on any free intersection.'
+                                'The primary objective of Gomoku is to create an unbroken chain of five stones in any direction - horizontally, vertically, or diagonally. The game is won by the first player who successfully forms this chain. If all the intersections on the board are occupied and no player has formed a line of five, the game results in a draw. Unlike Go, in Gomoku, stones once placed on the board are never removed.');
                           },
                         ),
                         ListTile(
