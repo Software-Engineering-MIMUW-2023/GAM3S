@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-<img src="https://github.com/Software-Engineering-MIMUW-2023/GAM3S/blob/main/Logo.png" width=50% height=50%>
+<img src="https://github.com/Software-Engineering-MIMUW-2023/GAM3S/blob/main/Logo.png" width=100% height=100%>
 </p>
 <br/><br/>
 
