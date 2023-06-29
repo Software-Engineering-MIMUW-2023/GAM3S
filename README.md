@@ -36,6 +36,35 @@ Just download .apk file which you can find in "apk/GAM3S.apk", put it on your ph
 Follow steps above to run app on your computer. Then, select Build > Build Bundle(s)/APK(s) > Build APK(s) from the toolbar menu.
 Put generated .apk file on your phone and have fun :)
 
+# Games
+
+## Tic Tac Toe
+Tic-Tac-Toe is a classic game played on a 3x3 grid. The game involves two players, represented by X and O, taking turns to mark empty cells on the grid. The objective is to form a line of three of your own marks (horizontally, vertically, or diagonally) before the opponent does.
+
+The game starts with an empty grid, and players take turns placing their marks in any available cell. Once a player successfully forms a line of three marks, they win the game. If all cells are filled without any player achieving a winning line, the game ends in a draw. The game can be played repeatedly, with players taking turns to make their moves until a winner is determined or the game ends in a draw.
+
+<p align="center">
+<img src="https://github.com/kornelhowil/GAM3S/blob/main/screenshots/tic_tac_toe.png" width=30% height=30%>
+</p>
+
+## Dots and Boxes
+Players take turns connecting two adjacent dots with a line. \
+When a player completes a box, they claim it and get an extra turn. \
+The game ends when all dots are connected. \
+The player with the most claimed boxes wins.
+                                
+<p align="center">
+<img src="https://github.com/kornelhowil/GAM3S/blob/main/screenshots/dots_and_boxes.png" width=30% height=30%>
+</p>
+
+## Snakess
+The Snake game is played by two players. At the beginning of the game, each player's snake is located at one of the corners of the board and consists only of a head. The head of each snake is marked with the letter 'S'. \
+During the game, players take turns moving their snakes on the board. To move a snake, a player must tap on an empty tile that is in the same row, column, or diagonal as the snake's head. The tile should not be already occupied by the other player. \
+The goal of the game is to cross the enemy snake as many times as possible. The player with the highest number of crossings wins. \
+To cross an enemy snake, a player must move their snake through the area where the enemy snake lies. This can be done by passing through the head, body, or tail of the enemy snake. In one turn, only one point can be gained by crossing the enemy snake, regardless of how many times it is crossed. There is no penalty for crossing your own snake.
+<p align="center">
+<img src="https://github.com/kornelhowil/GAM3S/blob/main/screenshots/snakess.png" width=30% height=30%>
+</p>
 
 # Diagrams
 
