@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+// Class that keeps a state of the game. By modifying data in it one can
+// manipulate the look and functionality of screen widgets
 class GState {
   bool greenTurn;
   int gHeadX;
@@ -22,17 +24,21 @@ class GState {
   GState(this.greenTurn, this.gHeadX, this.gHeadY, this.yHeadX, this.yHeadY, this.row, this.col);
 }
 
+// Map for mapping the int value into colors of main buttons
 Map<int, Color> setColor = {
   -1: Colors.amber,
   0: Colors.lightBlue,
   1: Colors.green,
 };
 
+// Mapping true/false value to player color
 Map<bool, Color> setPlayerCol  = {
   false: Colors.amber,
   true: Colors.green,
 };
 
+// Mapping the color of first player depending of whether he can push the button.
+// If button is not available for player it should turn red.
 Map<bool, Color> setColorGSPlash = {
   false: Colors.redAccent,
   true: Colors.greenAccent,
@@ -48,23 +54,24 @@ Map<bool, Map<bool, Color>> setColorSplash  = {
   true: setColorGSPlash,
 };
 
+
 class MyWidget extends StatefulWidget {
   const MyWidget({super.key});
-
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     throw UnimplementedError();
   }
 }
 
+// This function is use to modify game state. It changes the possible moves
+// array for current player.
 List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, int xHeadY){
   List<List<bool>> xMoves =   List.generate(
       row, (i) => List.filled(col, false, growable: false),
       growable: false);
-//print("--xmoves:--\n");
   bool moves = false;
-  // poziome ustalnie pozycji
+
+  // Horizontal position.
   for (var i = 0; i < col; i++) {
     if (pos[xHeadX][i] == 0) {
       xMoves[xHeadX][i] = true;
@@ -72,23 +79,19 @@ List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, in
     }
   }
 
-  // pionowe ustalanie pozycji
+  // Vertical position.
   for (var i = 0; i < row; i++) {
     if (pos[i][xHeadY] == 0) {
       xMoves[i][xHeadY] = true;
       moves = true;
     }
   }
-  //print("Heads: $xHeadX, $xHeadY \n");
-  // na skos w z dołu w prawo
+
+  // Cross from left down to right up.
   int delta = min(xHeadY, row-1-xHeadX);
   int px = xHeadX + delta;
   int py = xHeadY - delta;
-/*  int px = (xHeadX + xHeadY);
-  if (px > row-1) px = row-1;
-  int py = (xHeadX + xHeadY) - col + 1;
-  if (py<0) py = 0;*/
-  //print("dl to ur: $px, $py \n");
+
   while(px != -1 && py != col) {
     if (pos[px][py] == 0) {
       xMoves[px][py] = true;
@@ -98,15 +101,11 @@ List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, in
     px-=1;
   }
 
-  //na skos z góry na prawo
+  // Cross from left up to right down
   delta = min(xHeadY, xHeadX);
   px = xHeadX - delta;
   py = xHeadY - delta;
-/*  px = (xHeadX - xHeadY);
-  if (px < 0) px = 0;
-  py = (xHeadY - xHeadX);
-  if (py < 0) py = 0;*/
-  //print("ul to dr: $px, $py \n");
+
   while(px != row && py != col) {
     if (pos[px][py] == 0) {
       xMoves[px][py] = true;
@@ -118,6 +117,7 @@ List<dynamic> UpdateXState(int row, int col, List<List<int>> pos, int xHeadX, in
   return [xMoves,moves];
 }
 
+// Function for generating simple mono color lists of buttons.
 List<List<int>> monoListPost(int row, int col, int winner) {
   List<List<int>> ret;
   if (winner == 0) {
@@ -128,11 +128,12 @@ List<List<int>> monoListPost(int row, int col, int winner) {
   else {
     ret  = List.generate(
         row, (i) => List.filled(col, winner, growable: false));
-
   }
    return ret;
 }
 
+
+// Function for generating starting state.
 GState GenerateGState(int row, int col) {
 
   GState state = GState(true, 0, col-1, row-1, 0, row, col);
@@ -193,7 +194,7 @@ String whereIsHead(int x, int y,GState state) {
   return ret;
 }
 
-
+// Functions for generating proper buttons grid.
 List<SizedBox> listMaker(int row, int col, GState state,  Function(int x, int y, GState state) func) {
   List<SizedBox> toReturn = List.generate(
       col,
@@ -307,19 +308,13 @@ class Snakess extends StatefulWidget {
 
 class _MyHomePageState extends State<Snakess> {
 
+  // Game also works for any other sizes (min value is 2).
   static int row = 5;
   static int col = 5;
-
   late GState state = GenerateGState(row, col);
-
 
   void _makeTurn(int x, int y, GState state) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       int posToken = -1;
       List<List<bool>> allowed = state.yMoves;
       List<List<bool>> enemy_allowed = state.gMoves;
@@ -366,10 +361,6 @@ class _MyHomePageState extends State<Snakess> {
           y+= toAddY;
           //print("Pos added x: $x, y: $y\n");
         } while (x != myHeadX || y != myHeadY);
-        // aktualizacja allowed:
-        //Uwaga!!! Od nowa trzeba zrobić cały na false!!! Najlepiej zrobić funkcję, której ”edziemożna
-        // użyć też przy inicjacji i tutaj...
-        //
         state.greenTurn = !state.greenTurn;
 
         if (state.greenTurn == true) { //ruch wykonał żółty
@@ -422,11 +413,8 @@ class _MyHomePageState extends State<Snakess> {
           }
         }
       }
-      //print("states: ${state.gMobility}, ${state.yMobility}");
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -447,8 +435,8 @@ class _MyHomePageState extends State<Snakess> {
       body: Center(
         child: Column(children:  <Widget>[Spacer(),
           Text(
-            '${state.result}',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            state.result,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Spacer(),
           Expanded(flex: 10,child: SingleChildScrollView(
@@ -492,8 +480,6 @@ class _MyHomePageState extends State<Snakess> {
               heroTag: null,
               onPressed: () {
                 setState(() {
-
-
                 });
               },
               tooltip: 'Green_Score',
@@ -505,8 +491,6 @@ class _MyHomePageState extends State<Snakess> {
               heroTag: null,
               onPressed: () {
                 setState(() {
-
-
                 });
               },
               tooltip: 'Green_Score',
