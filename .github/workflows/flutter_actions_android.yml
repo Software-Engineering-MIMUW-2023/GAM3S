@@ -29,3 +29,7 @@ jobs:
       - run: flutter test
       - run: flutter build apk
       - run: flutter build appbundle
+      - uses: actions/upload-artifact@v3
+        with:
+          name: GAM3S.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
